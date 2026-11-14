@@ -5,8 +5,10 @@
    ■ 방문자: data/edits.json 에 저장된 수정 글자를 불러와 기본 글자 대신 보여 줍니다.
    ■ 원장님: 주소 뒤에 ?edit 를 붙여 들어오면 편집 모드가 켜집니다.
        예) https://shellem40-pixel.github.io/gritscience-new/?edit
-   ■ 고칠 수 있는 곳: HTML 에 data-edit="이름" 이 붙은 글자만.
-       고칠 곳을 늘리려면 태그에 data-edit="겹치지-않는-이름" 만 붙이면 됩니다.
+   ■ 고칠 수 있는 곳: data-edit="이름" 이 붙은 글자만.
+       - 이름이 '@'로 시작하면 여러 페이지가 함께 쓰는 글자입니다.
+         (예: 반 이름은 홈 "개설 과정"과 시간표 페이지에 함께 반영)
+       - 같은 이름이 한 페이지에 여러 곳 있으면 한 곳을 고칠 때 함께 바뀝니다.
    ■ 저장: GitHub 저장소의 data/edits.json 파일 하나에만 저장합니다.
        토큰은 이 브라우저(localStorage)에만 보관하고, 홈페이지 파일에는 넣지 않습니다.
    ========================================================= */
@@ -22,7 +24,7 @@
     revealAfter: 1500              // 수정 글자를 못 불러와도 이 시간(ms) 뒤에는 글자를 보여 줌
   };
 
-  const PAGE_NAMES = { home: '홈', schedule: '시간표', curriculum: '커리큘럼', notice: '공지사항', blog: '블로그' };
+  const PAGE_NAMES = { home: '홈', schedule: '시간표&커리큘럼', curriculum: '커리큘럼', notice: '공지사항', blog: '블로그' };
 
   /* ----- 1. 불러오는 동안 원래 글자가 깜빡이지 않게 잠깐 숨김 ----- */
   const root = document.documentElement;
@@ -69,7 +71,7 @@
   const state = {
     page: 'page',
     els: [],
-    defaults: {},   // HTML 파일에 원래 적힌 글자
+    defaults: {},   // 처음 화면에 그려진 글자
     baseline: {},   // 마지막으로 저장된(또는 불러온) 글자
     data: emptyData(),
     token: null,    // 브라우저 저장이 막혔을 때 임시 보관
@@ -77,14 +79,18 @@
     leaving: false
   };
 
-  function emptyData() { return { version: 1, pages: {} }; }
+  function emptyData() { return { version: 1, pages: {}, shared: {} }; }
   function normalize(d) {
     if (!d || typeof d !== 'object') return emptyData();
     if (!d.pages || typeof d.pages !== 'object') d.pages = {};
+    if (!d.shared || typeof d.shared !== 'object') d.shared = {};
     return d;
   }
   function keyOf(el) { return el.dataset.edit; }
+  function isShared(key) { return key.charAt(0) === '@'; }
   function pageName() { return PAGE_NAMES[state.page] || state.page; }
+  function uniqueKeys() { return [...new Set(state.els.map(keyOf))]; }
+  function firstEl(key) { return state.els.find((el) => keyOf(el) === key); }
 
   /* =========================================================
      글자 정리: 허용한 꾸밈(줄바꿈, 굵게, 강조, 작은 글씨, 링크)만 남김
@@ -154,16 +160,31 @@
     });
   }
 
+  /* 같은 이름의 다른 글자도 똑같이 맞춤 */
+  function syncSame(el) {
+    const key = keyOf(el);
+    state.els.forEach(o => {
+      if (o !== el && keyOf(o) === key && o.innerHTML !== el.innerHTML) {
+        o.innerHTML = el.innerHTML;
+        fixLinks(o);
+      }
+    });
+  }
+
   /* =========================================================
-     2. 시작: 기본 글자 기억 → 저장된 수정 글자 불러오기 → 적용
+     2. 시작: 화면이 다 그려진 뒤(app.js 다음) → 저장된 수정 글자 불러오기 → 적용
      ========================================================= */
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  function boot() { setTimeout(init, 0); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 
   async function init() {
     state.page = (document.body && document.body.dataset.page) || 'page';
     state.els = Array.from(document.querySelectorAll('[data-edit]'));
-    state.els.forEach(el => { state.defaults[keyOf(el)] = clean(el.innerHTML); });
+    state.els.forEach(el => {
+      const key = keyOf(el);
+      if (!(key in state.defaults)) state.defaults[key] = clean(el.innerHTML);
+    });
 
     try {
       state.data = editMode ? await loadForEditor() : await loadFromSite();
@@ -172,6 +193,7 @@
     }
     applyEdits();
     reveal();
+    document.dispatchEvent(new CustomEvent('edits:applied', { detail: { shared: state.data.shared || {} } }));
     if (editMode) startEditor();
   }
 
@@ -193,10 +215,12 @@
 
   function applyEdits() {
     const mine = state.data.pages[state.page] || {};
+    const shared = state.data.shared || {};
     state.els.forEach(el => {
       const key = keyOf(el);
-      if (Object.prototype.hasOwnProperty.call(mine, key)) {
-        const html = clean(mine[key]);
+      const src = isShared(key) ? shared : mine;
+      if (Object.prototype.hasOwnProperty.call(src, key)) {
+        const html = clean(src[key]);
         if (html) el.innerHTML = html;
       }
       fixLinks(el);
@@ -261,15 +285,23 @@
     return { data, sha: json.sha || null };
   }
 
-  /* 이 페이지에서 기본 글자와 다른 것만 모음 */
+  /* 이 페이지에서 처음 글자와 다른 것만 모음 (페이지 전용 / 함께 쓰는 글자 나눠서) */
   function collectEdits() {
-    const out = {};
-    state.els.forEach(el => {
-      const key = keyOf(el);
+    const page = {};
+    const shared = {};
+    const sharedKeys = [];
+    uniqueKeys().forEach(key => {
+      const el = firstEl(key);
       const html = clean(el.innerHTML);
-      if (html && html !== state.defaults[key]) out[key] = html;
+      const changed = html && html !== state.defaults[key];
+      if (isShared(key)) {
+        sharedKeys.push(key);
+        if (changed) shared[key] = html;
+      } else if (changed) {
+        page[key] = html;
+      }
     });
-    return out;
+    return { page, shared, sharedKeys };
   }
 
   async function writeRemote(token, attempt) {
@@ -277,8 +309,14 @@
     const remote = await readRemote(token);
     const data = remote.data;
     const mine = collectEdits();
-    if (Object.keys(mine).length) data.pages[state.page] = mine;
+
+    if (Object.keys(mine.page).length) data.pages[state.page] = mine.page;
     else delete data.pages[state.page];
+
+    mine.sharedKeys.forEach(k => {
+      if (Object.prototype.hasOwnProperty.call(mine.shared, k)) data.shared[k] = mine.shared[k];
+      else delete data.shared[k];
+    });
     data.updated = new Date().toISOString();
 
     const body = {
@@ -373,7 +411,7 @@
   }
 
   function unsavedCount() {
-    return state.els.filter(el => clean(el.innerHTML) !== state.baseline[keyOf(el)]).length;
+    return uniqueKeys().filter(key => clean(firstEl(key).innerHTML) !== state.baseline[key]).length;
   }
 
   function markChanged() {
@@ -396,7 +434,11 @@
   /* ----- 글자 입력 처리 ----- */
   function isSingleLine(el) { return ['A', 'SPAN', 'STRONG', 'DD'].includes(el.tagName); }
 
-  function onChange() { markChanged(); updateBar(); }
+  function onChange(e) {
+    if (e && e.currentTarget) syncSame(e.currentTarget);
+    markChanged();
+    updateBar();
+  }
 
   function onKey(e) {
     const el = e.currentTarget;
@@ -424,6 +466,7 @@
       el.innerHTML = html;
     }
     fixLinks(el);
+    syncSame(el);
     markChanged();
     updateBar();
   }
