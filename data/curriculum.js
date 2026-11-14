@@ -1,6 +1,8 @@
 /*
   커리큘럼 데이터
-  - id 는 시간표 버튼 주소(curriculum.html#m3 등)와 연결됩니다. 바꾸지 마세요.
+  - id 는 시간표의 "커리큘럼 보기" 버튼 주소(curriculum.html#m-base 등)와 연결됩니다. 바꾸지 마세요.
+  - grade 가 같은 과정끼리 위쪽 탭(중등, 고1, 고2, 고3)으로 묶입니다.
+  - 수업 시간은 data/schedule.js 에 적힌 시간이 자동으로 나옵니다.
 */
 const MIDDLE_STEPS = [
   { title: "개념 마인드맵", desc: "단원의 핵심 개념을 한 장의 마인드맵으로 구조화해 전체 흐름을 잡습니다." },
@@ -8,6 +10,22 @@ const MIDDLE_STEPS = [
   { title: "개인 수준별 첨삭", desc: "화·수 첨삭 수업에서 취약한 유형을 개인별로 보완합니다." },
   { title: "학교별 기출 분석", desc: "재학 중인 학교의 출제 경향을 분석해 서술형까지 대비합니다." },
   { title: "실전 모의평가 · 오답 정리", desc: "시험 형식의 모의평가 후 스마트 오답노트로 마무리합니다." }
+];
+
+const MIDDLE_PLUS_STEPS = [
+  { title: "개념 마인드맵", desc: "현재 학년 단원의 핵심 개념을 구조화해 정리합니다." },
+  { title: "문제은행 내신 훈련", desc: "학교 시험 빈출 유형을 반복해 내신을 먼저 단단히 합니다." },
+  { title: "다음 학년 선행 개념", desc: "다음 학년 과학의 핵심 개념을 미리 익혀 여유를 만듭니다." },
+  { title: "개인 수준별 첨삭", desc: "선행과 내신에서 막히는 부분을 개인별로 보완합니다." },
+  { title: "실전 평가 · 오답 정리", desc: "내신 모의평가와 선행 단원 평가 후 오답을 정리합니다." }
+];
+
+const PRE_HIGH_STEPS = [
+  { title: "중등 핵심 개념 총정리", desc: "고등 과학의 바탕이 되는 중등 개념을 빠짐없이 정리합니다." },
+  { title: "고등 통합과학 개념 선행", desc: "고1 통합과학의 핵심 단원을 마인드맵으로 미리 익힙니다." },
+  { title: "문제은행 유형 훈련", desc: "고등 수준의 유형을 단계적으로 풀며 사고력을 기릅니다." },
+  { title: "중등 내신 병행 대비", desc: "선행 중에도 학교 내신 시험은 놓치지 않도록 대비합니다." },
+  { title: "고등 진입 진단 평가", desc: "고등 진학 전 실력을 진단하고 취약 단원을 보완합니다." }
 ];
 
 const HIGH_STEPS = [
@@ -18,13 +36,37 @@ const HIGH_STEPS = [
   { title: "내신 실전 모의고사", desc: "학교 시험과 같은 형식으로 실전 감각을 완성합니다." }
 ];
 
-const MIDDLE_TIME = "일요반 · 토요반 · 화요반 · 수요반";
-const HIGH_TIME = "토요반 오후 2:30-5:00 · 토요반 오후 7:30-10:00 · 일요반 오후 5:00-7:30";
+const PRE_STEPS = [
+  { title: "고1 내신 병행", desc: "현재 학년 통합과학 내신을 먼저 챙기며 선행을 진행합니다." },
+  { title: "물리학 개념 선행", desc: "고2 물리학의 핵심 개념과 원리를 마인드맵으로 익힙니다." },
+  { title: "화학 개념 선행", desc: "고2 화학의 핵심 개념과 계산 유형을 미리 다집니다." },
+  { title: "문제은행 유형 훈련", desc: "선행 단원의 기본·심화 유형을 단계적으로 훈련합니다." },
+  { title: "진단 평가 · 오답 정리", desc: "단원 평가로 이해도를 점검하고 오답노트로 마무리합니다." }
+];
+
+const SUNEUNG_STEPS = [
+  { title: "수능 개념 총정리", desc: "통합과학 전 범위 개념을 수능 출제 관점으로 다시 정리합니다." },
+  { title: "기출 유형 분석", desc: "평가원 기출을 유형별로 분석해 출제 패턴을 익힙니다." },
+  { title: "문제은행 실전 훈련", desc: "실전 난이도의 문항을 시간 안에 푸는 훈련을 합니다." },
+  { title: "학습 데이터 분석", desc: "오답 데이터로 약점 유형을 찾아 집중적으로 보완합니다." },
+  { title: "실전 모의고사 · 파이널", desc: "실전 모의고사와 파이널 정리로 수능을 마무리합니다." }
+];
 
 const CURRICULUM = [
-  { id: "m3", short: "중등3", group: "중등 과학 내신대비", title: "중등 3학년 커리큘럼", target: "중학교 3학년", time: MIDDLE_TIME, goal: "고등 과학으로 이어지는 핵심 개념을 완성하고 중3 내신을 대비합니다.", steps: MIDDLE_STEPS },
-  { id: "m2", short: "중등2", group: "중등 과학 내신대비", title: "중등 2학년 커리큘럼", target: "중학교 2학년", time: MIDDLE_TIME, goal: "중등 과학의 기초 개념을 탄탄히 다지고 학교 내신을 대비합니다.", steps: MIDDLE_STEPS },
-  { id: "m1", short: "중등1", group: "중등 과학 내신대비", title: "중등 1학년 커리큘럼", target: "중학교 1학년", time: MIDDLE_TIME, goal: "과학 공부 습관을 만들고 첫 내신 시험을 준비합니다.", steps: MIDDLE_STEPS },
-  { id: "h1", short: "고1 통합과학", group: "고1 통합과학 내신대비", title: "고1 통합과학 커리큘럼", target: "고등학교 1학년", time: HIGH_TIME, goal: "고1 통합과학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS },
-  { id: "h2", short: "고2 물리학", group: "고2 물리학 내신대비", title: "고2 물리학 커리큘럼", target: "고등학교 2학년", time: HIGH_TIME, goal: "고2 물리학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS }
+  { id: "m-base", grade: "중등", group: "중등 과학 내신대비", title: "중등 내신대비반", target: "중학교 1~3학년", goal: "중등 과학의 기초 개념을 탄탄히 다지고 학교 내신을 대비합니다.", steps: MIDDLE_STEPS },
+  { id: "m-plus", grade: "중등", group: "중등 과학 내신대비", title: "중등 내신대비+선행반", target: "중학교 1~3학년", goal: "현재 학년 내신을 완성하면서 다음 학년 과학을 미리 준비합니다.", steps: MIDDLE_PLUS_STEPS },
+  { id: "m-high", grade: "중등", group: "중등 과학 내신대비", title: "고등과정 선행반+내신대비", target: "중학교 2~3학년", goal: "중등 내신을 지키면서 고등 통합과학을 미리 완성합니다.", steps: PRE_HIGH_STEPS },
+
+  { id: "h1-int", grade: "고1", group: "고1 통합과학 내신대비", title: "고1 통합과학 내신대비반", target: "고등학교 1학년", goal: "고1 통합과학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS },
+  { id: "h1-pre", grade: "고1", group: "고1 통합과학 내신대비", title: "고2과정 물리·화학 선행반+내신대비반", target: "고등학교 1학년", goal: "고1 내신을 챙기면서 고2 물리학·화학을 미리 준비합니다.", steps: PRE_STEPS },
+
+  { id: "h2-phy", grade: "고2", group: "고2 과학 내신대비", title: "고2 물리학 내신대비반", target: "고등학교 2학년", goal: "고2 물리학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS },
+  { id: "h2-chem", grade: "고2", group: "고2 과학 내신대비", title: "고2 화학 내신대비반", target: "고등학교 2학년", goal: "고2 화학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS },
+  { id: "h2-bio", grade: "고2", group: "고2 과학 내신대비", title: "고2 생명과학 내신대비반", target: "고등학교 2학년", goal: "고2 생명과학 내신 1등급을 목표로 합니다.", steps: HIGH_STEPS },
+
+  { id: "h3-naesin", grade: "고3", group: "고3 내신 · 수능 대비", title: "고3 물·화·생 내신대비반", target: "고등학교 3학년", goal: "고3 물리학·화학·생명과학 내신을 마지막까지 책임집니다.", steps: HIGH_STEPS },
+  { id: "h3-sat", grade: "고3", group: "고3 내신 · 수능 대비", title: "고3 통합과학 수능반 (문과반 · 이과반)", target: "고등학교 3학년", goal: "통합과학 수능을 문과반·이과반으로 나누어 목표에 맞게 준비합니다.", steps: SUNEUNG_STEPS }
 ];
+
+/* 예전 주소(curriculum.html#m1 등)로 들어와도 맞는 과정으로 이동합니다. */
+const CURRICULUM_ALIAS = { m1: "m-base", m2: "m-base", m3: "m-base", h1: "h1-int", h2: "h2-phy" };
