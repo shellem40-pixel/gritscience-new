@@ -1,46 +1,80 @@
-/* ===== 시간표&커리큘럼: 바로가기 탭, 겨울방학 특강, 커리큘럼 한눈에 보기 =====
+/* ===== 시간표&커리큘럼: 탭(겨울방학 특강 / 정규수업 고등 / 정규수업 중등 / 커리큘럼) =====
    style.css, subpage.css 다음에 불러옵니다. */
+.sp-panel[hidden], .wc[hidden], .cs[hidden] { display: none !important; }
 
-/* 바로가기 탭 아래로 제목이 가리지 않게 */
-body[data-page="schedule"] main section[id] { scroll-margin-top: calc(var(--tabs-h) + 8px); }
-.sched-tabs a.is-hot::before {
-  content: "";
-  width: 6px; height: 6px; margin-right: 8px;
-  border-radius: 50%; background: var(--c-accent);
+/* ----- 위쪽 탭 ----- */
+.sched-tabs .curr-tabs-inner { align-items: center; }
+.sched-tabs a { gap: 8px; }
+.tab-sep { flex-shrink: 0; width: 1px; height: 20px; margin: 0 6px; background: var(--c-line); }
+.sched-tabs a.is-winter { color: var(--c-primary); }
+.sched-tabs a.is-winter::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent);
 }
+.sched-tabs a.is-winter.is-active { background: var(--c-primary); color: #fff; border-color: var(--c-primary-dark); }
+.sched-tabs a.is-winter.is-active::before { background: #fff; }
 
-/* 정규 시간표 보조 */
-.class-list b { color: var(--c-text); margin-right: 4px; }
+/* ----- 구역 머리 띠 ----- */
+.sp-banner { padding: 52px 0 44px; text-align: center; }
+.sp-banner.is-winter { background: var(--c-primary); color: #fff; }
+.sp-banner.is-regular { background: #fff; border-bottom: 1px solid var(--c-line); }
+.sp-badge {
+  display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; letter-spacing: .12em;
+}
+.is-winter .sp-badge { background: rgba(255, 255, 255, .18); color: #fff; }
+.is-regular .sp-badge { background: var(--c-primary-soft); color: var(--c-primary); }
+.sp-title { font-size: clamp(28px, 3.4vw, 38px); font-weight: 800; letter-spacing: -.03em; line-height: 1.3; }
+.sp-lead { margin-top: 10px; font-size: 17px; line-height: 1.7; }
+.is-winter .sp-lead { font-size: 20px; font-weight: 700; color: #fff; }
+.is-regular .sp-lead { color: var(--c-sub); }
+
+.sp-jump { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.sp-jump a {
+  min-width: 64px; height: 38px; padding: 0 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-line); border-radius: 999px;
+  font-size: 15px; font-weight: 700; color: var(--c-primary);
+  transition: background-color .15s, border-color .15s;
+}
+.sp-jump a:hover { border-color: var(--c-primary); background: var(--c-primary-soft); }
+
+.sp-body { padding: 40px 0 72px; }
+.sp-body.is-tint { background: var(--c-tint); }
+
+/* 편집 모드: 파란 띠 위에서는 흰 점선 */
+html.is-editing .sp-banner.is-winter [data-edit] { outline-color: rgba(255, 255, 255, .5); }
+html.is-editing .sp-banner.is-winter [data-edit]:hover,
+html.is-editing .sp-banner.is-winter [data-edit]:focus { outline-color: #fff; background-color: rgba(255, 255, 255, .08); }
+
+/* ----- 수업 시간 글자 (여러 줄) ----- */
+.time-lines { font-size: 16px; line-height: 1.8; color: var(--c-sub); }
+.time-lines b, .time-lines strong { color: var(--c-text); font-weight: 700; margin-right: 4px; }
 .tbd { font-size: 14px; color: var(--c-muted); }
+
+/* ----- 정규수업: 반 목록 ----- */
+.sp-panel .sched-block { scroll-margin-top: calc(var(--header-h) + var(--tabs-h) + 8px); }
+.sp-panel .sched-block:last-child { border-bottom: 0; }
+.sp-panel .sched-info {
+  flex: 1; display: grid; grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: 6px 28px; align-items: start;
+}
+.sp-panel .sched-info .cls-name { line-height: 1.5; padding-top: 2px; }
 .sched-info .sub { font-weight: 500; color: var(--c-muted); }
 
 /* ----- 겨울방학 특강 ----- */
-.winter {
-  padding: 64px 0;
-  background: var(--c-tint);
-  border-bottom: 1px solid var(--c-tint-line);
-}
-.winter-head { text-align: center; margin-bottom: 32px; }
-.winter-badge {
-  display: inline-block; margin-bottom: 14px; padding: 5px 12px;
-  border-radius: 999px; background: var(--c-primary); color: #fff;
-  font-size: 12px; font-weight: 700; letter-spacing: .1em;
-}
-.winter-head .sched-title { margin-bottom: 0; }
-.winter-lead { margin-top: 14px; font-size: 18px; font-weight: 700; }
-
 .winter-info {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px;
+  max-width: 900px; margin: 28px auto 0; text-align: left;
+  background: #fff; color: var(--c-text); border-radius: 8px;
 }
-.winter-info div { padding: 18px 24px; }
+.winter-info div { padding: 16px 22px; }
 .winter-info div + div { border-left: 1px solid var(--c-tint-line); }
 .winter-info dt { font-size: 13px; color: var(--c-muted); }
 .winter-info dd { font-size: 16px; font-weight: 600; }
 .winter-info a:hover { color: var(--c-primary); text-decoration: underline; }
-.winter-note { margin-top: 12px; text-align: center; font-size: 14px; color: var(--c-muted); }
+.winter-note { text-align: center; font-size: 14px; color: var(--c-muted); }
 
-.winter-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 32px 0 24px; }
+.winter-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0 28px; }
 .wf-btn {
   height: 38px; padding: 0 18px; border-radius: 999px;
   border: 1px solid var(--c-tint-line); background: #fff;
@@ -66,46 +100,127 @@ body[data-page="schedule"] main section[id] { scroll-margin-top: calc(var(--tabs
 .wc-status.is-hot { color: var(--c-accent); }
 .wc-status.is-closed { color: var(--c-muted); }
 .wc h3 { font-size: 18px; line-height: 1.4; letter-spacing: -.01em; margin-bottom: 14px; }
-
-.wc-table { width: 100%; border-collapse: collapse; font-size: 15px; border-top: 1px solid var(--c-text); }
-.wc-table th, .wc-table td { padding: 10px 4px; border-bottom: 1px solid var(--c-line); text-align: left; }
-.wc-table th { width: 38%; font-weight: 600; color: var(--c-sub); white-space: nowrap; }
-
-.wc-meta { display: grid; gap: 4px; margin-top: 14px; font-size: 14px; }
+.wc-times { padding: 12px 0; border-top: 1px solid var(--c-text); border-bottom: 1px solid var(--c-line); }
+.wc-label { font-size: 13px; color: var(--c-muted); margin-bottom: 2px; }
+.wc-times .time-lines { font-size: 15px; }
+.wc-meta { display: grid; gap: 4px; margin-top: 12px; font-size: 14px; }
 .wc-meta div { display: flex; gap: 10px; }
 .wc-meta dt { width: 40px; flex-shrink: 0; color: var(--c-muted); }
-.wc-desc { margin-top: 10px; font-size: 14px; color: var(--c-sub); }
 .wc-link { margin-top: auto; padding-top: 16px; font-size: 15px; font-weight: 600; color: var(--c-primary); }
 .wc-link:hover { text-decoration: underline; }
 
-/* ----- 커리큘럼 한눈에 보기 ----- */
-.co-lead { margin: -24px 0 32px; text-align: center; color: var(--c-sub); }
-.co-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.co-card { background: #fff; border: 1px solid var(--c-line); border-radius: 6px; padding: 24px; }
-.is-tint .co-card { border-color: var(--c-tint-line); }
-.co-card h3 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 17px; line-height: 1.35; }
-.co-card .course-tag { width: 40px; height: 40px; font-size: 14px; }
-.co-card li + li { border-top: 1px solid var(--c-line); }
-.co-card a { display: flex; justify-content: space-between; gap: 8px; padding: 11px 0; font-size: 15px; }
-.co-card a span { flex-shrink: 0; color: var(--c-muted); transition: transform .15s, color .15s; }
-.co-card a:hover { color: var(--c-primary); }
-.co-card a:hover span { color: var(--c-primary); transform: translateX(3px); }
+/* ----- 커리큘럼: 과정 고르기 ----- */
+.cp-picker {
+  display: grid; gap: 14px; margin-bottom: 28px; padding: 22px 24px;
+  background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px;
+}
+.cp-group { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: start; }
+.cp-group + .cp-group { padding-top: 14px; border-top: 1px solid var(--c-line); }
+.cp-label { padding-top: 6px; font-size: 14px; font-weight: 700; color: var(--c-sub); }
+.cp-group.is-winter .cp-label { color: var(--c-primary); }
+.cp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cp-chip {
+  padding: 6px 14px; border: 1px solid var(--c-line); border-radius: 999px; background: #fff;
+  font-size: 14px; font-weight: 600; color: var(--c-sub);
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.cp-chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.cp-chip.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+
+/* ----- 커리큘럼: 상세 ----- */
+.cs {
+  background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px; padding: 36px;
+  scroll-margin-top: calc(var(--header-h) + var(--tabs-h) + 8px);
+}
+.cs-title { font-size: 28px; line-height: 1.35; letter-spacing: -.02em; }
+.cs-title .sub { font-size: 18px; font-weight: 500; color: var(--c-muted); }
+.cs-goal { margin-top: 6px; font-size: 17px; color: var(--c-sub); }
+
+.cs-facts {
+  display: grid; grid-template-columns: 1fr 1.3fr 1.3fr;
+  margin: 24px 0 28px; border-top: 2px solid var(--c-text);
+}
+.cs-facts > div { padding: 14px 18px; border-bottom: 1px solid var(--c-line); }
+.cs-facts > div + div { border-left: 1px solid var(--c-line); }
+.cs-facts dt { font-size: 13px; color: var(--c-muted); margin-bottom: 4px; }
+.cs-facts dd { font-size: 15px; font-weight: 600; }
+.cs-facts .time-lines { font-size: 15px; font-weight: 500; }
+
+/* STEP: PC 넓은 화면은 한 줄 */
+.cs-steps { display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr)); gap: 10px; margin-bottom: 24px; }
+.cs-steps li {
+  background: #fbfdfe; border: 1px solid var(--c-tint-line); border-top: 3px solid var(--c-primary);
+  border-radius: 4px; padding: 16px 14px;
+}
+.cs-steps .step-no { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--c-primary); }
+.cs-steps h4 { font-size: 15px; line-height: 1.4; margin: 6px 0; letter-spacing: -.01em; }
+.cs-steps .step-desc { font-size: 13px; line-height: 1.6; color: var(--c-sub); }
+.step-detail { display: none; }
+.curr-note { margin-top: 20px; font-size: 14px; color: var(--c-muted); }
+
+/* 창이 좁아지면 두 줄 (8개 → 4개씩, 6개 → 3개씩) */
+@media (max-width: 1100px) {
+  .cs-steps[data-n="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cs-steps[data-n="6"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cs-steps:not([data-n="8"]):not([data-n="6"]) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cs-steps li { padding: 18px 16px; }
+  .cs-steps h4 { font-size: 16px; }
+  .cs-steps .step-desc { font-size: 14px; }
+}
 
 /* ----- 태블릿 ----- */
 @media (max-width: 1024px) {
-  .winter-grid, .co-grid { grid-template-columns: repeat(2, 1fr); }
+  .winter-grid { grid-template-columns: repeat(2, 1fr); }
+  .cs { padding: 28px; }
+  .sp-panel .sched-info { grid-template-columns: minmax(200px, 280px) 1fr; }
 }
 
 /* ----- 휴대폰 ----- */
 @media (max-width: 640px) {
-  .winter { padding: 48px 0; }
-  .winter-lead { font-size: 16px; }
-  .winter-info { grid-template-columns: 1fr; }
-  .winter-info div { padding: 14px 18px; }
+  .sp-banner { padding: 40px 0 32px; }
+  .sp-lead { font-size: 15px; }
+  .is-winter .sp-lead { font-size: 17px; }
+  .sp-body { padding: 28px 0 56px; }
+
+  .sp-panel .sched-info { grid-template-columns: 1fr; }
+  .time-lines { font-size: 15px; }
+
+  .winter-info { grid-template-columns: 1fr; margin-top: 22px; }
+  .winter-info div { padding: 12px 16px; }
   .winter-info div + div { border-left: 0; border-top: 1px solid var(--c-tint-line); }
-  .winter-filter { justify-content: flex-start; margin: 24px 0 18px; }
+  .winter-filter { justify-content: flex-start; margin: 18px 0 18px; }
   .wf-btn { height: 36px; padding: 0 14px; font-size: 14px; }
-  .winter-grid, .co-grid { grid-template-columns: 1fr; gap: 16px; }
+  .winter-grid { grid-template-columns: 1fr; gap: 16px; }
   .wc { padding: 18px; }
-  .co-lead { margin-top: -16px; }
+
+  .cp-picker { padding: 16px; }
+  .cp-group { grid-template-columns: 1fr; gap: 8px; }
+  .cp-label { padding-top: 0; }
+  .cp-chip { font-size: 13px; padding: 6px 12px; }
+
+  .cs { padding: 22px 16px; }
+  .cs-title { font-size: 22px; }
+  .cs-title .sub { font-size: 15px; }
+  .cs-goal { font-size: 15px; }
+  .cs-facts { grid-template-columns: 1fr; }
+  .cs-facts > div + div { border-left: 0; }
+
+  /* STEP: 8개 → 4개씩, 6개 → 3개씩. 칸을 누르면 아래에 설명이 나옵니다 */
+  .cs-steps { gap: 6px; margin-bottom: 0; }
+  .cs-steps li { padding: 10px 6px 12px; text-align: center; cursor: pointer; }
+  .cs-steps .step-no { font-size: 10px; letter-spacing: .02em; }
+  .cs-steps h4 { font-size: 13px; margin: 4px 0 0; }
+  .cs-steps .step-desc { display: none; }
+  .cs-steps li.is-picked { background: var(--c-primary); border-color: var(--c-primary); }
+  .cs-steps li.is-picked .step-no, .cs-steps li.is-picked h4 { color: #fff; }
+  .step-detail {
+    display: block; margin: 10px 0 20px; padding: 14px 16px;
+    border-radius: 6px; background: var(--c-primary-soft);
+  }
+  .step-detail .step-no { font-size: 12px; font-weight: 700; color: var(--c-primary); }
+  .step-detail strong { display: block; margin: 2px 0 4px; font-size: 16px; }
+  .step-detail p { font-size: 14px; color: var(--c-sub); }
+
+  html.is-editing .cs-steps .step-desc { display: block; text-align: left; }
+  html.is-editing .step-detail { display: none; }
 }
