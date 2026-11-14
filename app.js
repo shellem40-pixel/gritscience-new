@@ -6,7 +6,8 @@ const SITE = {
   author: '과학쟁이 원장',
   phone: '031-918-9912',
   tel: '0319189912',
-  email: 'shellem40@gmail.com'
+  email: 'shellem40@gmail.com',
+  address: '경기도 고양시 일산서구 일산로 562 (신일산연합상가)'
 };
 
 const NAV = [
@@ -81,6 +82,7 @@ function renderFooter() {
       <div class="footer-brand">
         <strong>${esc(SITE.name)}</strong>
         <p>새로운 과학 학습 밀착 관리 시스템 · 심화학습연구소</p>
+        <p><a href="about.html#location">${esc(SITE.address)}</a></p>
       </div>
       <dl class="footer-info">
         <div><dt>전화상담</dt><dd><a href="tel:${SITE.tel}">${SITE.phone}</a></dd></div>
