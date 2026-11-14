@@ -10,8 +10,10 @@ const SITE = {
   address: '경기도 고양시 일산서구 일산로 562 (신일산연합상가)'
 };
 
+/* 오시는 길은 홈 맨 아래(index.html#location)에 있습니다. */
+const LOCATION_URL = 'index.html#location';
+
 const NAV = [
-  { href: 'about.html', label: '학원&시스템', key: 'about' },
   { href: 'schedule.html', label: '시간표&커리큘럼', key: 'schedule' },
   { href: 'blog.html', label: '블로그', key: 'blog' },
   { href: 'notice.html', label: '공지사항', key: 'notice' }
@@ -97,13 +99,14 @@ function renderHeader() {
 function renderFooter() {
   const el = document.getElementById('site-footer');
   if (!el) return;
+  const isHome = document.body.dataset.page === 'home';
   el.className = 'site-footer';
   el.innerHTML = `
     <div class="container footer-inner">
       <div class="footer-brand">
         <strong>${esc(SITE.name)}</strong>
         <p>새로운 과학 학습 밀착 관리 시스템 · 심화학습연구소</p>
-        <p><a href="about.html#location">${esc(SITE.address)}</a></p>
+        <p><a href="${isHome ? '#location' : LOCATION_URL}">${esc(SITE.address)}</a></p>
       </div>
       <dl class="footer-info">
         <div><dt>전화상담</dt><dd><a href="tel:${SITE.tel}">${SITE.phone}</a></dd></div>
@@ -183,6 +186,14 @@ function initHome() {
   const postEl = document.getElementById('home-posts');
   if (postEl && hasPosts()) {
     postEl.innerHTML = [...POSTS].sort(byNewest).slice(0, 3).map(postCard).join('');
+  }
+
+  /* 다른 페이지에서 index.html#location 으로 들어왔을 때 오시는 길로 이동
+     (사진·블로그 카드가 그려진 뒤 위치가 바뀌므로 한 번 더 맞춰 줍니다) */
+  const target = location.hash && document.getElementById(location.hash.slice(1));
+  if (target) {
+    requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    window.addEventListener('load', () => target.scrollIntoView({ block: 'start' }), { once: true });
   }
 }
 
