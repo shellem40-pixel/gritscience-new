@@ -35,14 +35,14 @@
 
         <aside class="hero-panel" aria-labelledby="hero-panel-title">
           <div class="hero-panel-head">
-            <h2 id="hero-panel-title">개설 과정</h2>
+            <h2 id="hero-panel-title" data-edit="panel-title">개설 과정</h2>
             <a href="schedule.html">전체 시간표 →</a>
           </div>
-          <!-- 과정 목록은 data/schedule.js 에서 자동으로 채워집니다 -->
+          <!-- 과정 목록은 data/schedule.js 에서 자동으로 채워지고, 편집 모드에서 글자를 고칠 수 있습니다 -->
           <ul class="course-list" id="hero-courses"></ul>
           <a class="hero-winter" id="hero-winter" href="schedule.html#winter" hidden>
             <span class="hw-label">WINTER</span>
-            <span class="hw-text">겨울방학 특강 대 개강</span>
+            <span class="hw-text" data-edit="@winter.banner">겨울방학 특강 대 개강</span>
             <span class="hw-arrow" aria-hidden="true">→</span>
           </a>
         </aside>
@@ -81,7 +81,7 @@
           <article class="principle">
             <span class="num">03</span>
             <h3 data-edit="dir3-title">개인별 맞춤 로드맵</h3>
-            <p data-edit="dir3-text">목표 대학과 현재 수준에 맞춘 최적화된 5단계 커리큘럼으로 단기간에 성적 향상을 이끌어냅니다.</p>
+            <p data-edit="dir3-text">목표 대학과 현재 수준에 맞춘 최적화된 단계별 커리큘럼으로 단기간에 성적 향상을 이끌어냅니다.</p>
           </article>
         </div>
       </div>
