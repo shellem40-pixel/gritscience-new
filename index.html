@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="home.css">
   <link rel="stylesheet" href="location.css">
+  <link rel="stylesheet" href="editor.css">
+  <script src="editor.js"></script>
 </head>
 <body data-page="home">
   <header id="site-header"></header>
@@ -17,17 +19,17 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
-          <p class="eyebrow">새로운 과학 학습 밀착 관리 시스템</p>
-          <h1>GRIT그릿과학쟁이 &amp;<br>일산SP과학 심화학습연구소</h1>
-          <p class="lead">30년 동안 중고등학생의 내신과 수능을 지도해 온 현장 노하우로, 불필요한 시행착오는 줄이고 가장 효율적인 학습 경로를 제시합니다.</p>
+          <p class="eyebrow" data-edit="hero-eyebrow">새로운 과학 학습 밀착 관리 시스템</p>
+          <h1 data-edit="hero-title">GRIT그릿과학쟁이 &amp;<br>일산SP과학 심화학습연구소</h1>
+          <p class="lead" data-edit="hero-lead">30년 동안 중고등학생의 내신과 수능을 지도해 온 현장 노하우로, 불필요한 시행착오는 줄이고 가장 효율적인 학습 경로를 제시합니다.</p>
           <div class="btn-row">
             <a class="btn btn-primary" href="schedule.html">시간표 및 커리큘럼 보기</a>
             <a class="btn btn-outline" href="tel:0319189912">상담 전화 031-918-9912</a>
           </div>
           <ul class="hero-stats">
-            <li><strong>30년</strong><span>중고등 과학 현장 지도</span></li>
-            <li><strong>중1 – 고3</strong><span>내신 · 수능 과학</span></li>
-            <li><strong>맞춤 첨삭</strong><span>개인 수준별 첨삭 수업</span></li>
+            <li><strong data-edit="stat1-num">30년</strong><span data-edit="stat1-text">중고등 과학 현장 지도</span></li>
+            <li><strong data-edit="stat2-num">중1 – 고3</strong><span data-edit="stat2-text">내신 · 수능 과학</span></li>
+            <li><strong data-edit="stat3-num">맞춤 첨삭</strong><span data-edit="stat3-text">개인 수준별 첨삭 수업</span></li>
           </ul>
         </div>
 
@@ -47,39 +49,39 @@
       </div>
     </section>
 
-    <!-- 학원 소개 (예전 학원&시스템 페이지에서 옮겨 옴) -->
+    <!-- 학원 소개 -->
     <section class="section" id="intro">
       <div class="container intro-split">
-        <p class="intro-quote">흔들리지 않는 실력,<br><em>GRIT</em>을 키웁니다.</p>
+        <p class="intro-quote" data-edit="intro-quote">흔들리지 않는 실력,<br><em>GRIT</em>을 키웁니다.</p>
         <div class="intro-text">
-          <p>30년 동안 수많은 중고등학생들의 내신과 수능을 지도하며 쌓아온 현장 노하우를 바탕으로, 불필요한 시행착오는 줄이고 가장 효율적인 학습 경로를 제시합니다.</p>
-          <p>학생 스스로 파고드는 심화 학습의 길을 <strong>GRIT과학쟁이 &amp; 일산SP과학</strong>이 함께 걷겠습니다.</p>
+          <p data-edit="intro-p1">30년 동안 수많은 중고등학생들의 내신과 수능을 지도하며 쌓아온 현장 노하우를 바탕으로, 불필요한 시행착오는 줄이고 가장 효율적인 학습 경로를 제시합니다.</p>
+          <p data-edit="intro-p2">학생 스스로 파고드는 심화 학습의 길을 <strong>GRIT과학쟁이 &amp; 일산SP과학</strong>이 함께 걷겠습니다.</p>
         </div>
       </div>
     </section>
 
-    <!-- 핵심 지도 방향 (예전 학원&시스템 페이지에서 옮겨 옴) -->
+    <!-- 핵심 지도 방향 -->
     <section class="section section-soft">
       <div class="container">
         <div class="section-head">
           <p class="eyebrow">DIRECTION</p>
-          <h2 class="section-title">핵심 지도 방향</h2>
+          <h2 class="section-title" data-edit="dir-title">핵심 지도 방향</h2>
         </div>
         <div class="principles">
           <article class="principle">
             <span class="num">01</span>
-            <h3>정확한 데이터 분석</h3>
-            <p>감에 의존하지 않고, 자체 개발한 데이터베이스를 통해 학생의 취약점을 정확히 진단합니다.</p>
+            <h3 data-edit="dir1-title">정확한 데이터 분석</h3>
+            <p data-edit="dir1-text">감에 의존하지 않고, 자체 개발한 데이터베이스를 통해 학생의 취약점을 정확히 진단합니다.</p>
           </article>
           <article class="principle">
             <span class="num">02</span>
-            <h3>스마트 오답노트</h3>
-            <p>틀린 문제를 완벽하게 내 것으로 만들 때까지 집요하게 물고 늘어지는 훈련을 진행합니다.</p>
+            <h3 data-edit="dir2-title">스마트 오답노트</h3>
+            <p data-edit="dir2-text">틀린 문제를 완벽하게 내 것으로 만들 때까지 집요하게 물고 늘어지는 훈련을 진행합니다.</p>
           </article>
           <article class="principle">
             <span class="num">03</span>
-            <h3>개인별 맞춤 로드맵</h3>
-            <p>목표 대학과 현재 수준에 맞춘 최적화된 5단계 커리큘럼으로 단기간에 성적 향상을 이끌어냅니다.</p>
+            <h3 data-edit="dir3-title">개인별 맞춤 로드맵</h3>
+            <p data-edit="dir3-text">목표 대학과 현재 수준에 맞춘 최적화된 5단계 커리큘럼으로 단기간에 성적 향상을 이끌어냅니다.</p>
           </article>
         </div>
       </div>
@@ -89,28 +91,28 @@
       <div class="container">
         <div class="section-head">
           <p class="eyebrow">SYSTEM</p>
-          <h2 class="section-title">학원 시스템</h2>
+          <h2 class="section-title" data-edit="sys-title">학원 시스템</h2>
         </div>
         <div class="grid-4">
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo1.png" alt="" loading="lazy"></div>
-            <h3>수능 만점자 학습 시스템</h3>
-            <p>최적화된 커리큘럼과 밀착 코칭 결합. 개념 마인드맵, 문제은행, 학습데이터 분석을 통한 단계별 체계적 교재 라인업.</p>
+            <h3 data-edit="sys1-title">수능 만점자 학습 시스템</h3>
+            <p data-edit="sys1-text">최적화된 커리큘럼과 밀착 코칭 결합. 개념 마인드맵, 문제은행, 학습데이터 분석을 통한 단계별 체계적 교재 라인업.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo2.png" alt="" loading="lazy"></div>
-            <h3>정확한 학습 데이터 분석</h3>
-            <p>불필요한 과정은 줄이고 가장 효율적인 학습 경로 제시. 과학쟁이 문제은행 및 오답문제 작성 도구 지원.</p>
+            <h3 data-edit="sys2-title">정확한 학습 데이터 분석</h3>
+            <p data-edit="sys2-text">불필요한 과정은 줄이고 가장 효율적인 학습 경로 제시. 과학쟁이 문제은행 및 오답문제 작성 도구 지원.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo3.png" alt="" loading="lazy"></div>
-            <h3>개인별 맞춤 로드맵 (첨삭시스템)</h3>
-            <p>단기간에 완벽 마스터! 사고력과 문제 해결 능력을 극대화하여 어떤 난이도라도 돌파할 자신감 부여.</p>
+            <h3 data-edit="sys3-title">개인별 맞춤 로드맵 (첨삭시스템)</h3>
+            <p data-edit="sys3-text">단기간에 완벽 마스터! 사고력과 문제 해결 능력을 극대화하여 어떤 난이도라도 돌파할 자신감 부여.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo4.png" alt="" loading="lazy"></div>
-            <h3>단계별 과정 학습 시스템</h3>
-            <p>빈틈없는 밀착 관리와 실시간 피드백으로 취약점 보완. 단계별 진행상황을 파악하여 보상 프로그램 진행.</p>
+            <h3 data-edit="sys4-title">단계별 과정 학습 시스템</h3>
+            <p data-edit="sys4-text">빈틈없는 밀착 관리와 실시간 피드백으로 취약점 보완. 단계별 진행상황을 파악하여 보상 프로그램 진행.</p>
           </article>
         </div>
       </div>
@@ -120,28 +122,28 @@
       <div class="container">
         <div class="section-head">
           <p class="eyebrow">VALUES</p>
-          <h2 class="section-title">핵심 가치</h2>
+          <h2 class="section-title" data-edit="val-title">핵심 가치</h2>
         </div>
         <div class="grid-4">
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo5.png" alt="" loading="lazy"></div>
-            <h3>장기목표 위한 지속적 열정</h3>
-            <p>수업 하나하나에 진심을 담아, 학생보다 더 뜨겁게 공부합니다.</p>
+            <h3 data-edit="val1-title">장기목표 위한 지속적 열정</h3>
+            <p data-edit="val1-text">수업 하나하나에 진심을 담아, 학생보다 더 뜨겁게 공부합니다.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo6.png" alt="" loading="lazy"></div>
-            <h3>장기목표 위한 꾸준한 노력</h3>
-            <p>기초부터 심화까지, 학생이 정확하게 이해할 때까지 함께합니다.</p>
+            <h3 data-edit="val2-title">장기목표 위한 꾸준한 노력</h3>
+            <p data-edit="val2-text">기초부터 심화까지, 학생이 정확하게 이해할 때까지 함께합니다.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo7.png" alt="" loading="lazy"></div>
-            <h3>그리고 책임감</h3>
-            <p>결과가 나올 때까지 포기하지 않는 지도, 끝까지 함께 가는 선생님이 되겠습니다.</p>
+            <h3 data-edit="val3-title">그리고 책임감</h3>
+            <p data-edit="val3-text">결과가 나올 때까지 포기하지 않는 지도, 끝까지 함께 가는 선생님이 되겠습니다.</p>
           </article>
           <article class="feature-card">
             <div class="media"><img src="https://shellem40-pixel.github.io/gritscience/assets/images/HOME_photo8.png" alt="" loading="lazy"></div>
-            <h3>학부모의 절실한 마음으로</h3>
-            <p>학부모의 절실한 마음으로 한 명 한 명 정성껏 가르치겠습니다.</p>
+            <h3 data-edit="val4-title">학부모의 절실한 마음으로</h3>
+            <p data-edit="val4-text">학부모의 절실한 마음으로 한 명 한 명 정성껏 가르치겠습니다.</p>
           </article>
         </div>
       </div>
@@ -157,11 +159,11 @@
           <ul class="mini-list" id="home-notices"></ul>
         </div>
         <aside class="contact-card">
-          <p class="contact-label">상담 문의</p>
-          <a class="contact-phone" href="tel:0319189912">031-918-9912</a>
+          <p class="contact-label" data-edit="contact-label">상담 문의</p>
+          <a class="contact-phone" href="tel:0319189912" data-edit="contact-phone">031-918-9912</a>
           <dl class="contact-hours">
-            <div><dt>평일</dt><dd>오후 2:00 – 오후 10:00</dd></div>
-            <div><dt>토·일</dt><dd>오전 10:00 – 오후 10:00</dd></div>
+            <div><dt>평일</dt><dd data-edit="contact-weekday">오후 2:00 – 오후 10:00</dd></div>
+            <div><dt>토·일</dt><dd data-edit="contact-weekend">오전 10:00 – 오후 10:00</dd></div>
           </dl>
           <a class="btn btn-light" href="#location">오시는 길 보기</a>
         </aside>
@@ -178,12 +180,12 @@
       </div>
     </section>
 
-    <!-- 오시는 길 및 연락처 (예전 학원&시스템 페이지에서 옮겨 옴, 푸터 바로 위) -->
+    <!-- 오시는 길 및 연락처 (푸터 바로 위) -->
     <section class="section" id="location">
       <div class="container">
         <div class="section-head">
           <p class="eyebrow">LOCATION</p>
-          <h2 class="section-title">오시는 길 및 연락처</h2>
+          <h2 class="section-title" data-edit="loc-title">오시는 길 및 연락처</h2>
         </div>
         <div class="location">
           <div class="map-wrap">
@@ -205,10 +207,10 @@
             </div>
           </div>
           <ul class="info-list">
-            <li><span>위치</span><p>경기도 고양시 일산서구 일산로 562<br><small class="addr-sub">(신일산연합상가)</small></p></li>
-            <li><span>상담 문의</span><p><a href="tel:0319189912">031-918-9912</a></p></li>
-            <li><span>운영 시간</span><p>평일 오후 2:00 – 오후 10:00<br>토·일 오전 10:00 – 오후 10:00</p></li>
-            <li><span>이메일</span><p><a href="mailto:shellem40@gmail.com">shellem40@gmail.com</a></p></li>
+            <li><span>위치</span><p data-edit="loc-address">경기도 고양시 일산서구 일산로 562<br><small class="addr-sub">(신일산연합상가)</small></p></li>
+            <li><span>상담 문의</span><p data-edit="loc-phone"><a href="tel:0319189912">031-918-9912</a></p></li>
+            <li><span>운영 시간</span><p data-edit="loc-hours">평일 오후 2:00 – 오후 10:00<br>토·일 오전 10:00 – 오후 10:00</p></li>
+            <li><span>이메일</span><p data-edit="loc-email"><a href="mailto:shellem40@gmail.com">shellem40@gmail.com</a></p></li>
           </ul>
         </div>
       </div>
