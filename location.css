@@ -1,0 +1,34 @@
+/* ===== 학원&시스템: 오시는 길 (지도와 지도 앱 버튼) ===== */
+.map-wrap { display: grid; gap: 12px; }
+
+.map-box.has-map {
+  display: block;
+  overflow: hidden;
+  background: #e9edf1;
+  border: 1px solid var(--c-line);
+}
+.map-box.has-map iframe { display: block; }
+
+.map-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.map-btn {
+  flex: 1 1 200px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  color: var(--c-text);
+}
+.map-btn:hover { border-color: var(--c-text); }
+
+.map-dot {
+  width: 20px; height: 20px; display: grid; place-items: center;
+  border-radius: 4px; font-size: 11px; font-weight: 800; line-height: 1;
+}
+.dot-naver { background: #03c75a; color: #fff; }
+.dot-kakao { background: #fee500; color: #191919; }
+
+.addr-sub { font-size: 14px; color: var(--c-muted); }
+
+/* 핸드폰: 지도를 조금 더 세로로 길게 */
+@media (max-width: 640px) {
+  .map-box.has-map { aspect-ratio: 4 / 3; }
+  .map-btn { flex-basis: 100%; }
+}
