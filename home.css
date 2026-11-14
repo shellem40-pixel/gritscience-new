@@ -1,0 +1,55 @@
+/* ===== 홈 타이틀: 개설 과정 카드 (반 이름 여러 줄) + 겨울방학 특강 배너 =====
+   색은 기존 카드와 같습니다. style.css 다음에 불러옵니다. */
+.course-list a { align-items: flex-start; padding: 14px 2px; }
+.course-list .course-tag { margin-top: 2px; }
+.course-list .course-arrow { align-self: center; }
+
+.course-body .course-line {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: -.01em;
+  color: var(--c-text);
+  transition: color .15s;
+}
+.course-body .course-line .sub {
+  display: inline;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-muted);
+}
+.course-list a:hover .course-line { color: var(--c-primary); }
+
+/* 겨울방학 특강 배너 */
+.hero-winter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: var(--c-primary);
+  color: #fff;
+  transition: background-color .15s;
+}
+.hero-winter[hidden] { display: none; }
+.hero-winter:hover { background: var(--c-primary-dark); }
+.hw-label {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+.hw-text { flex: 1; font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.hw-arrow { flex-shrink: 0; transition: transform .15s; }
+.hero-winter:hover .hw-arrow { transform: translateX(3px); }
+
+@media (max-width: 640px) {
+  .course-body .course-line { font-size: 14px; }
+  .hero-winter { padding: 12px 14px; }
+  .hw-text { font-size: 16px; }
+}
