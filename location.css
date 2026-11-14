@@ -1,4 +1,4 @@
-/* ===== 학원&시스템: 오시는 길 (지도와 지도 앱 버튼) ===== */
+/* ===== 홈: 오시는 길 (지도와 지도 앱 버튼) ===== */
 .map-wrap { display: grid; gap: 12px; }
 
 .map-box.has-map {
@@ -26,6 +26,9 @@
 .dot-kakao { background: #fee500; color: #191919; }
 
 .addr-sub { font-size: 14px; color: var(--c-muted); }
+
+/* 홈 맨 아래 오시는 길: 푸터와 자연스럽게 이어지도록 위쪽에 얇은 선 */
+body[data-page="home"] #location { border-top: 1px solid var(--c-line); }
 
 /* 핸드폰: 지도를 조금 더 세로로 길게 */
 @media (max-width: 640px) {
