@@ -1,0 +1,219 @@
+/* ===== 편집 모드 (editor.js 와 함께 사용) ===== */
+
+/* 방문자: 저장된 수정 글자를 불러오는 아주 짧은 순간에 원래 글자가 깜빡이지 않게 */
+html.edits-pending [data-edit] { visibility: hidden; }
+
+:root {
+  --ed-navy: #0e3448;
+  --ed-blue: #1f6b93;
+  --ed-gold: #f0b429;
+  --ed-red: #b42318;
+  --ed-line: #d9e1e7;
+  --ed-text: #1a1f24;
+  --ed-muted: #5b6670;
+}
+
+/* ----- 고칠 수 있는 글자: 점선 테두리 ----- */
+html.is-editing body { padding-bottom: 84px; }
+
+html.is-editing [data-edit] {
+  outline: 1.5px dashed rgba(31, 107, 147, .45);
+  outline-offset: 3px;
+  border-radius: 2px;
+  cursor: text;
+  transition: outline-color .15s, background-color .15s;
+}
+html.is-editing [data-edit]:hover { outline-color: var(--ed-blue); }
+html.is-editing [data-edit]:focus {
+  outline: 2px solid var(--ed-blue);
+  background-color: rgba(31, 107, 147, .06);
+}
+
+/* 짙은 남색 배경(홈 타이틀, 페이지 타이틀) 위에서는 흰 점선 */
+html.is-editing .hero [data-edit],
+html.is-editing .page-head [data-edit] { outline-color: rgba(255, 255, 255, .45); }
+html.is-editing .hero [data-edit]:hover,
+html.is-editing .page-head [data-edit]:hover { outline-color: #fff; }
+html.is-editing .hero [data-edit]:focus,
+html.is-editing .page-head [data-edit]:focus {
+  outline-color: #fff;
+  background-color: rgba(255, 255, 255, .08);
+}
+
+/* 고쳤지만 아직 저장하지 않은 글자 */
+html.is-editing [data-edit].edit-changed { background-color: rgba(240, 180, 41, .18); }
+
+/* ----- 아래쪽 편집 막대 ----- */
+.ed-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 24px;
+  background: var(--ed-navy);
+  color: #fff;
+  box-shadow: 0 -6px 20px rgba(14, 52, 72, .18);
+  font-family: inherit;
+}
+.ed-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ed-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ed-gold);
+  color: #1a1a1a;
+  font-size: 12px;
+  font-weight: 800;
+}
+.ed-status { font-size: 14px; color: rgba(255, 255, 255, .8); }
+.ed-status.is-dirty { color: #fff; font-weight: 700; }
+
+.ed-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ed-btn {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+.ed-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .1); border-color: #fff; }
+.ed-btn.is-primary { background: #fff; border-color: #fff; color: var(--ed-navy); }
+.ed-btn.is-primary:hover:not(:disabled) { background: #e8f0f5; }
+.ed-btn.is-ghost { border-color: transparent; color: rgba(255, 255, 255, .8); }
+.ed-btn:disabled { opacity: .45; cursor: default; }
+.ed-btn:focus-visible { outline: 2px solid var(--ed-gold); outline-offset: 2px; }
+
+/* ----- 알림 ----- */
+.ed-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 80px;
+  z-index: 1001;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #1a1f24;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity .2s, transform .2s;
+}
+.ed-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+.ed-toast.is-error { background: var(--ed-red); }
+
+/* ----- 창(모달) ----- */
+.ed-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 25, 35, .55);
+}
+.ed-modal-box {
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 26px 24px 22px;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ed-text);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+}
+.ed-title { margin: 0 0 10px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.ed-text { margin: 0 0 14px; font-size: 15px; line-height: 1.65; color: var(--ed-muted); }
+.ed-text b { color: var(--ed-text); }
+.ed-text.is-small { margin-top: 12px; font-size: 13px; }
+
+.ed-steps {
+  margin: 0 0 14px;
+  padding: 14px 16px 14px 34px;
+  list-style: decimal;
+  border-radius: 8px;
+  background: #f3f6f9;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.ed-steps li { list-style: decimal; }
+
+.ed-link {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ed-blue);
+}
+.ed-link:hover { text-decoration: underline; }
+
+.ed-label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
+.ed-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--ed-line);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 15px;
+}
+.ed-input:focus { outline: 2px solid var(--ed-blue); outline-offset: 0; border-color: var(--ed-blue); }
+.ed-error { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: var(--ed-red); }
+.ed-error[hidden] { display: none; }
+
+.ed-meta { margin: 0 0 16px; border-top: 1px solid var(--ed-line); }
+.ed-meta div { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ed-line); font-size: 14px; }
+.ed-meta dt { width: 80px; flex-shrink: 0; color: var(--ed-muted); }
+.ed-meta dd { margin: 0; font-weight: 600; word-break: break-all; }
+
+.ed-menu { display: grid; gap: 8px; }
+.ed-menu .ed-mbtn { width: 100%; text-align: left; }
+
+.ed-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.ed-mbtn {
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--ed-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ed-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ed-mbtn:hover:not(:disabled) { border-color: var(--ed-text); }
+.ed-mbtn.is-primary { background: var(--ed-blue); border-color: var(--ed-blue); color: #fff; }
+.ed-mbtn.is-primary:hover:not(:disabled) { background: #175473; }
+.ed-mbtn:disabled { opacity: .45; cursor: default; }
+
+/* ----- 휴대폰 ----- */
+@media (max-width: 640px) {
+  html.is-editing body { padding-bottom: 128px; }
+  .ed-bar { padding: 10px 14px; }
+  .ed-info, .ed-actions { width: 100%; }
+  .ed-actions .ed-btn { flex: 1 1 auto; padding: 0 10px; }
+  .ed-toast { bottom: 124px; }
+  .ed-modal-box { padding: 22px 18px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-editing [data-edit], .ed-btn, .ed-toast { transition: none; }
+}
