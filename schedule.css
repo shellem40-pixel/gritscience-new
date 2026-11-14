@@ -1,0 +1,111 @@
+/* ===== 시간표&커리큘럼: 바로가기 탭, 겨울방학 특강, 커리큘럼 한눈에 보기 =====
+   style.css, subpage.css 다음에 불러옵니다. */
+
+/* 바로가기 탭 아래로 제목이 가리지 않게 */
+body[data-page="schedule"] main section[id] { scroll-margin-top: calc(var(--tabs-h) + 8px); }
+.sched-tabs a.is-hot::before {
+  content: "";
+  width: 6px; height: 6px; margin-right: 8px;
+  border-radius: 50%; background: var(--c-accent);
+}
+
+/* 정규 시간표 보조 */
+.class-list b { color: var(--c-text); margin-right: 4px; }
+.tbd { font-size: 14px; color: var(--c-muted); }
+.sched-info .sub { font-weight: 500; color: var(--c-muted); }
+
+/* ----- 겨울방학 특강 ----- */
+.winter {
+  padding: 64px 0;
+  background: var(--c-tint);
+  border-bottom: 1px solid var(--c-tint-line);
+}
+.winter-head { text-align: center; margin-bottom: 32px; }
+.winter-badge {
+  display: inline-block; margin-bottom: 14px; padding: 5px 12px;
+  border-radius: 999px; background: var(--c-primary); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: .1em;
+}
+.winter-head .sched-title { margin-bottom: 0; }
+.winter-lead { margin-top: 14px; font-size: 18px; font-weight: 700; }
+
+.winter-info {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px;
+}
+.winter-info div { padding: 18px 24px; }
+.winter-info div + div { border-left: 1px solid var(--c-tint-line); }
+.winter-info dt { font-size: 13px; color: var(--c-muted); }
+.winter-info dd { font-size: 16px; font-weight: 600; }
+.winter-info a:hover { color: var(--c-primary); text-decoration: underline; }
+.winter-note { margin-top: 12px; text-align: center; font-size: 14px; color: var(--c-muted); }
+
+.winter-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 32px 0 24px; }
+.wf-btn {
+  height: 38px; padding: 0 18px; border-radius: 999px;
+  border: 1px solid var(--c-tint-line); background: #fff;
+  font-size: 15px; font-weight: 600; color: var(--c-sub);
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.wf-btn:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.wf-btn[aria-pressed="true"] { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+
+.winter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.wc {
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--c-tint-line); border-top: 3px solid var(--c-primary);
+  border-radius: 6px; padding: 22px 22px 20px;
+}
+.wc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.wc-grade {
+  font-size: 13px; font-weight: 700; color: var(--c-primary);
+  background: var(--c-primary-soft); padding: 3px 10px; border-radius: 999px;
+}
+.wc-status { font-size: 12px; font-weight: 700; padding: 1px 8px; border: 1px solid currentColor; border-radius: 3px; }
+.wc-status.is-open { color: var(--c-primary); }
+.wc-status.is-hot { color: var(--c-accent); }
+.wc-status.is-closed { color: var(--c-muted); }
+.wc h3 { font-size: 18px; line-height: 1.4; letter-spacing: -.01em; margin-bottom: 14px; }
+
+.wc-table { width: 100%; border-collapse: collapse; font-size: 15px; border-top: 1px solid var(--c-text); }
+.wc-table th, .wc-table td { padding: 10px 4px; border-bottom: 1px solid var(--c-line); text-align: left; }
+.wc-table th { width: 38%; font-weight: 600; color: var(--c-sub); white-space: nowrap; }
+
+.wc-meta { display: grid; gap: 4px; margin-top: 14px; font-size: 14px; }
+.wc-meta div { display: flex; gap: 10px; }
+.wc-meta dt { width: 40px; flex-shrink: 0; color: var(--c-muted); }
+.wc-desc { margin-top: 10px; font-size: 14px; color: var(--c-sub); }
+.wc-link { margin-top: auto; padding-top: 16px; font-size: 15px; font-weight: 600; color: var(--c-primary); }
+.wc-link:hover { text-decoration: underline; }
+
+/* ----- 커리큘럼 한눈에 보기 ----- */
+.co-lead { margin: -24px 0 32px; text-align: center; color: var(--c-sub); }
+.co-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.co-card { background: #fff; border: 1px solid var(--c-line); border-radius: 6px; padding: 24px; }
+.is-tint .co-card { border-color: var(--c-tint-line); }
+.co-card h3 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 17px; line-height: 1.35; }
+.co-card .course-tag { width: 40px; height: 40px; font-size: 14px; }
+.co-card li + li { border-top: 1px solid var(--c-line); }
+.co-card a { display: flex; justify-content: space-between; gap: 8px; padding: 11px 0; font-size: 15px; }
+.co-card a span { flex-shrink: 0; color: var(--c-muted); transition: transform .15s, color .15s; }
+.co-card a:hover { color: var(--c-primary); }
+.co-card a:hover span { color: var(--c-primary); transform: translateX(3px); }
+
+/* ----- 태블릿 ----- */
+@media (max-width: 1024px) {
+  .winter-grid, .co-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ----- 휴대폰 ----- */
+@media (max-width: 640px) {
+  .winter { padding: 48px 0; }
+  .winter-lead { font-size: 16px; }
+  .winter-info { grid-template-columns: 1fr; }
+  .winter-info div { padding: 14px 18px; }
+  .winter-info div + div { border-left: 0; border-top: 1px solid var(--c-tint-line); }
+  .winter-filter { justify-content: flex-start; margin: 24px 0 18px; }
+  .wf-btn { height: 36px; padding: 0 14px; font-size: 14px; }
+  .winter-grid, .co-grid { grid-template-columns: 1fr; gap: 16px; }
+  .wc { padding: 18px; }
+  .co-lead { margin-top: -16px; }
+}
