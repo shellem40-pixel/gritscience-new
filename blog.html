@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>블로그 - GRIT그릿과학쟁이 &amp; 일산SP과학</title>
+  <meta name="description" content="과학 학습 팁과 성적 향상 노하우">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="blog">
+  <header id="site-header"></header>
+
+  <main class="container blog-wrap">
+    <section class="blog-head">
+      <h1>GRIT 과학쟁이 블로그</h1>
+      <p>단순한 문제 풀이를 넘어, 학생 스스로 파고드는 흔들리지 않는 심화 학습 동기를 부여합니다. 최적화된 과학 학습 팁과 성적 향상 노하우를 연재합니다.</p>
+    </section>
+
+    <div class="blog-toolbar">
+      <div class="blog-tabs" id="blog-tabs" role="tablist" aria-label="블로그 분류"></div>
+      <form class="blog-search" id="blog-search" role="search">
+        <label class="sr-only" for="blog-q">블로그 검색</label>
+        <input id="blog-q" type="search" placeholder="글 검색" autocomplete="off">
+        <button type="button" class="search-btn" id="blog-search-btn" aria-label="검색 열기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="post-grid" id="post-grid"></div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="data/posts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
