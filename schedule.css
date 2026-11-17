@@ -9,23 +9,26 @@
 #panel-middle,     .sched-tabs a[data-panel="middle"]     { --panel: #4c5ba3; --panel-dark: #3a4787; } /* 정규 중등: 남보라 */
 #panel-curriculum, .sched-tabs a[data-panel="curriculum"] { --panel: #34495c; --panel-dark: #24394b; } /* 커리큘럼: 차분한 먹남색 */
 
+/* 커리큘럼 안에서 과정 종류별 색 */
+.cp-section.is-winter, .cs.is-winter { --sec: var(--c-primary); }
+.cp-section.is-high,   .cs.is-high   { --sec: #17716c; }
+.cp-section.is-middle, .cs.is-middle { --sec: #4c5ba3; }
+
 /* ----- 위쪽 탭 ----- */
 .sched-tabs .curr-tabs-inner { align-items: center; }
 .sched-tabs a { gap: 8px; }
 .tab-sep { flex-shrink: 0; width: 1px; height: 20px; margin: 0 6px; background: var(--c-line); }
 
-/* 탭 앞 작은 점: 각 탭의 색 (겨울방학 특강은 주황) */
 .sched-tabs a[data-panel]::before {
   content: ""; flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--panel);
 }
 .sched-tabs a.is-winter { color: var(--c-primary); }
 .sched-tabs a.is-winter::before { background: var(--c-accent); }
 
-/* 고른 탭: 그 탭의 색으로 채우기 */
 .sched-tabs a[data-panel].is-active { background: var(--panel); color: #fff; border-color: var(--panel-dark); }
 .sched-tabs a[data-panel].is-active::before { background: #fff; }
 
-/* ----- 구역 머리 띠: 탭마다 색만 다르고 모양은 같아요 ----- */
+/* ----- 구역 머리 띠 ----- */
 .sp-banner { padding: 52px 0 44px; text-align: center; background: var(--panel, var(--c-primary)); color: #fff; }
 .sp-banner.is-regular { border-bottom: 0; }
 .sp-badge {
@@ -37,7 +40,6 @@
 .sp-lead { margin-top: 10px; font-size: 17px; line-height: 1.7; color: rgba(255, 255, 255, .88); }
 .is-winter .sp-lead { font-size: 20px; font-weight: 700; color: #fff; }
 
-/* 고1 · 고2 · 고3 바로가기 버튼 (색 띠 위) */
 .sp-jump { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
 .sp-jump a {
   min-width: 64px; height: 38px; padding: 0 16px;
@@ -55,7 +57,7 @@
 /* 정규수업: 큰 제목 밑줄과 항목 세로선도 탭 색에 맞추기 */
 #panel-high .sched-title, #panel-middle .sched-title { color: var(--panel); }
 #panel-high .sched-title::after, #panel-middle .sched-title::after { background: var(--panel); }
-#panel-high .sched-info strong, #panel-middle .sched-info strong { border-left-color: var(--panel); }
+#panel-high .sched-info .cls-name, #panel-middle .sched-info .cls-name { border-left-color: var(--panel); }
 #panel-high .sched-btn, #panel-middle .sched-btn { background: var(--panel); border-color: var(--panel); }
 #panel-high .sched-btn:hover, #panel-middle .sched-btn:hover { background: var(--panel-dark); border-color: var(--panel-dark); }
 
@@ -68,17 +70,30 @@ html.is-editing .sp-banner .winter-info [data-edit] { outline-color: var(--c-pri
 /* ----- 수업 시간 글자 (여러 줄) ----- */
 .time-lines { font-size: 16px; line-height: 1.8; color: var(--c-sub); }
 .time-lines b, .time-lines strong { color: var(--c-text); font-weight: 700; margin-right: 4px; }
+/* 굵게(Ctrl+B)로 바꾼 시간 글자에는 왼쪽 세로선이 붙지 않게 */
+.sched-info .time-lines strong, .sched-info .cls-book strong { padding-left: 0; border-left: 0; }
+.time-lines.is-many { column-count: 2; column-gap: 40px; }
 .tbd { font-size: 14px; color: var(--c-muted); }
 
 /* ----- 정규수업: 반 목록 ----- */
 .sp-panel .sched-block { scroll-margin-top: calc(var(--header-h) + var(--tabs-h) + 8px); }
 .sp-panel .sched-block:last-child { border-bottom: 0; }
+.sched-sub {
+  margin: 10px 0 8px; text-align: center;
+  font-size: 16px; font-weight: 700; color: var(--panel, var(--c-primary));
+}
 .sp-panel .sched-info {
   flex: 1; display: grid; grid-template-columns: minmax(220px, 340px) 1fr;
   gap: 6px 28px; align-items: start;
 }
 .sp-panel .sched-info .cls-name { line-height: 1.5; padding-top: 2px; }
 .sched-info .sub { font-weight: 500; color: var(--c-muted); }
+.cls-detail { display: grid; gap: 6px; min-width: 0; }
+.cls-book { display: flex; align-items: baseline; gap: 8px; font-size: 15px; color: var(--c-sub); }
+.cls-book-label {
+  flex-shrink: 0; padding: 1px 7px; border: 1px solid var(--c-line); border-radius: 3px;
+  font-size: 12px; font-weight: 700; color: var(--c-muted); background: #fff;
+}
 
 /* ----- 겨울방학 특강 ----- */
 .winter-info {
@@ -130,60 +145,80 @@ html.is-editing .sp-banner .winter-info [data-edit] { outline-color: var(--c-pri
 
 /* ----- 커리큘럼: 과정 고르기 ----- */
 .cp-picker {
-  display: grid; gap: 14px; margin-bottom: 28px; padding: 22px 24px;
+  display: grid; gap: 18px; margin-bottom: 28px; padding: 22px 24px;
   background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px;
 }
-.cp-group { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: start; }
-.cp-group + .cp-group { padding-top: 14px; border-top: 1px solid var(--c-line); }
-.cp-label { padding-top: 6px; font-size: 14px; font-weight: 700; color: var(--c-sub); }
-.cp-group.is-winter .cp-label { color: var(--c-primary); }
+.cp-section + .cp-section { padding-top: 18px; border-top: 1px solid var(--c-line); }
+.cp-level {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  font-size: 14px; font-weight: 800; letter-spacing: .02em; color: var(--sec);
+}
+.cp-level::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sec); }
+.cp-group { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: start; }
+.cp-group + .cp-group { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--c-line); }
+.cp-label { padding-top: 6px; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--c-sub); }
 .cp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .cp-chip {
   padding: 6px 14px; border: 1px solid var(--c-line); border-radius: 999px; background: #fff;
   font-size: 14px; font-weight: 600; color: var(--c-sub);
   transition: background-color .15s, border-color .15s, color .15s;
 }
-.cp-chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
-.cp-chip.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.cp-chip:hover { border-color: var(--sec); color: var(--sec); }
+.cp-chip.is-active { background: var(--sec); border-color: var(--sec); color: #fff; }
 
 /* ----- 커리큘럼: 상세 ----- */
 .cs {
-  background: #fff; border: 1px solid var(--c-tint-line); border-radius: 8px; padding: 36px;
+  background: #fff; border: 1px solid var(--c-tint-line); border-top: 4px solid var(--sec, var(--c-primary));
+  border-radius: 8px; padding: 36px;
   scroll-margin-top: calc(var(--header-h) + var(--tabs-h) + 8px);
 }
+.cs .eyebrow { color: var(--sec, var(--c-primary)); }
 .cs-title { font-size: 28px; line-height: 1.35; letter-spacing: -.02em; }
 .cs-title .sub { font-size: 18px; font-weight: 500; color: var(--c-muted); }
 .cs-goal { margin-top: 6px; font-size: 17px; color: var(--c-sub); }
 
+/* 대상 | 수업 시간 | 교재 | 수업 특징 */
 .cs-facts {
-  display: grid; grid-template-columns: 1fr 1.3fr 1.3fr;
+  display: grid; grid-template-columns: .8fr 1.25fr 1fr 1.25fr;
   margin: 24px 0 28px; border-top: 2px solid var(--c-text);
 }
 .cs-facts > div { padding: 14px 18px; border-bottom: 1px solid var(--c-line); }
 .cs-facts > div + div { border-left: 1px solid var(--c-line); }
+.cs-facts .is-feat { background: #fbfdfe; }
 .cs-facts dt { font-size: 13px; color: var(--c-muted); margin-bottom: 4px; }
-.cs-facts dd { font-size: 15px; font-weight: 600; }
+.cs-facts dd { font-size: 15px; font-weight: 600; line-height: 1.6; }
 .cs-facts .time-lines { font-size: 15px; font-weight: 500; }
+.cs-facts .is-feat p { font-weight: 500; color: var(--c-text); }
 
-/* STEP: PC 넓은 화면은 한 줄 */
-.cs-steps { display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr)); gap: 10px; margin-bottom: 24px; }
-.cs-steps li {
-  background: #fbfdfe; border: 1px solid var(--c-tint-line); border-top: 3px solid var(--c-primary);
-  border-radius: 4px; padding: 16px 14px;
+/* 주차별 진도 */
+.cw-heading { margin-bottom: 12px; font-size: 15px; font-weight: 800; color: var(--c-text); }
+.cw-track + .cw-track { margin-top: 26px; }
+.cw-track-name { margin-bottom: 10px; }
+.cw-track-name span {
+  display: inline-block; padding: 3px 12px; border-radius: 999px;
+  background: var(--sec, var(--c-primary)); color: #fff; font-size: 14px; font-weight: 700;
 }
-.cs-steps .step-no { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--c-primary); }
-.cs-steps h4 { font-size: 15px; line-height: 1.4; margin: 6px 0; letter-spacing: -.01em; }
-.cs-steps .step-desc { font-size: 13px; line-height: 1.6; color: var(--c-sub); }
+.cs-steps {
+  display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
+  gap: 10px; margin-bottom: 8px;
+}
+.cs-steps li {
+  display: flex; flex-direction: column;
+  background: #fbfdfe; border: 1px solid var(--c-tint-line); border-top: 3px solid var(--sec, var(--c-primary));
+  border-radius: 4px; padding: 14px 12px;
+}
+.cs-steps .step-no { font-size: 13px; font-weight: 800; letter-spacing: .02em; color: var(--sec, var(--c-primary)); }
+.cs-steps .step-desc { margin-top: 6px; font-size: 13.5px; line-height: 1.6; color: var(--c-text); word-break: keep-all; }
+.wk-when { margin-top: auto; padding-top: 8px; font-size: 12px; font-weight: 600; color: var(--c-muted); }
 .step-detail { display: none; }
+.cw-note { margin-top: 12px; font-size: 14px; color: var(--c-sub); }
+.cs-back { display: inline-block; margin-top: 20px; }
 .curr-note { margin-top: 20px; font-size: 14px; color: var(--c-muted); }
 
-/* 창이 좁아지면 두 줄 (8개 → 4개씩, 6개 → 3개씩) */
+/* 창이 좁아지면 두 줄 이상 (8개 → 4개씩, 6개 → 3개씩) */
 @media (max-width: 1100px) {
-  .cs-steps[data-n="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .cs-steps[data-n="6"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cs-steps:not([data-n="8"]):not([data-n="6"]) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .cs-steps li { padding: 18px 16px; }
-  .cs-steps h4 { font-size: 16px; }
+  .cs-steps { grid-template-columns: repeat(var(--nt, 4), minmax(0, 1fr)); }
+  .cs-steps li { padding: 16px 14px; }
   .cs-steps .step-desc { font-size: 14px; }
 }
 
@@ -191,7 +226,10 @@ html.is-editing .sp-banner .winter-info [data-edit] { outline-color: var(--c-pri
 @media (max-width: 1024px) {
   .winter-grid { grid-template-columns: repeat(2, 1fr); }
   .cs { padding: 28px; }
-  .sp-panel .sched-info { grid-template-columns: minmax(200px, 280px) 1fr; }
+  .sp-panel .sched-info { grid-template-columns: minmax(200px, 260px) 1fr; }
+  .cs-facts { grid-template-columns: 1fr 1fr; }
+  .cs-facts > div:nth-child(odd) { border-left: 0; }
+  .cp-group { grid-template-columns: 180px 1fr; }
 }
 
 /* ----- 휴대폰 ----- */
@@ -205,6 +243,8 @@ html.is-editing .sp-banner .winter-info [data-edit] { outline-color: var(--c-pri
 
   .sp-panel .sched-info { grid-template-columns: 1fr; }
   .time-lines { font-size: 15px; }
+  .time-lines.is-many { column-count: 1; }
+  .cls-book { font-size: 14px; }
 
   .winter-info { grid-template-columns: 1fr; margin-top: 22px; }
   .winter-info div { padding: 12px 16px; }
@@ -226,22 +266,21 @@ html.is-editing .sp-banner .winter-info [data-edit] { outline-color: var(--c-pri
   .cs-facts { grid-template-columns: 1fr; }
   .cs-facts > div + div { border-left: 0; }
 
-  /* STEP: 8개 → 4개씩, 6개 → 3개씩. 칸을 누르면 아래에 설명이 나옵니다 */
+  /* 주차: 8개 → 4개씩, 6개 → 3개씩. 칸을 누르면 아래에 진도가 나옵니다 */
   .cs-steps { gap: 6px; margin-bottom: 0; }
-  .cs-steps li { padding: 10px 6px 12px; text-align: center; cursor: pointer; }
-  .cs-steps .step-no { font-size: 10px; letter-spacing: .02em; }
-  .cs-steps h4 { font-size: 13px; margin: 4px 0 0; }
-  .cs-steps .step-desc { display: none; }
-  .cs-steps li.is-picked { background: var(--c-primary); border-color: var(--c-primary); }
-  .cs-steps li.is-picked .step-no, .cs-steps li.is-picked h4 { color: #fff; }
+  .cs-steps li { padding: 12px 4px; text-align: center; cursor: pointer; }
+  .cs-steps .step-no { font-size: 12px; }
+  .cs-steps .wk-sfx, .cs-steps .step-desc, .cs-steps .wk-when { display: none; }
+  .cs-steps li.is-picked { background: var(--sec, var(--c-primary)); border-color: var(--sec, var(--c-primary)); }
+  .cs-steps li.is-picked .step-no { color: #fff; }
   .step-detail {
-    display: block; margin: 10px 0 20px; padding: 14px 16px;
+    display: block; margin: 10px 0 4px; padding: 14px 16px;
     border-radius: 6px; background: var(--c-primary-soft);
   }
-  .step-detail .step-no { font-size: 12px; font-weight: 700; color: var(--c-primary); }
-  .step-detail strong { display: block; margin: 2px 0 4px; font-size: 16px; }
-  .step-detail p { font-size: 14px; color: var(--c-sub); }
+  .step-detail .step-no { font-size: 13px; font-weight: 800; color: var(--sec, var(--c-primary)); }
+  .step-detail-body { margin-top: 4px; font-size: 15px; line-height: 1.7; color: var(--c-text); }
+  .step-detail .wk-when { margin-top: 6px; padding-top: 0; }
 
-  html.is-editing .cs-steps .step-desc { display: block; text-align: left; }
+  html.is-editing .cs-steps .step-desc { display: block; text-align: left; font-size: 13px; }
   html.is-editing .step-detail { display: none; }
 }
