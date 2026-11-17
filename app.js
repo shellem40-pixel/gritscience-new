@@ -43,8 +43,63 @@ function getParam(name) { return new URLSearchParams(location.search).get(name);
 const hasNotices = () => typeof NOTICES !== 'undefined';
 const hasPosts = () => typeof POSTS !== 'undefined';
 const hasSchedule = () => typeof REGULAR_COURSES !== 'undefined';
+const hasCurriculum = () => typeof CURRICULUM !== 'undefined';
 const hasWinter = () => typeof WINTER !== 'undefined' && WINTER.open !== false;
 const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ===== 데이터 파일 확인 =====
+   시간표(data/schedule.js)나 커리큘럼(data/curriculum.js)을 못 받았으면
+   한 번 더 새로 받아 보고, 그래도 안 되면 빈칸 대신 안내 문구를 보여 줍니다. */
+const DATA_FILES = {
+  home: [
+    { src: 'data/schedule.js', ok: () => typeof HOME_COURSES !== 'undefined' && hasSchedule() }
+  ],
+  schedule: [
+    { src: 'data/schedule.js', ok: hasSchedule },
+    { src: 'data/curriculum.js', ok: hasCurriculum }
+  ]
+};
+
+/* 편집 모드(editor.js)는 화면이 다 그려진 뒤에 시작하도록 이 신호를 기다립니다. */
+let resolveReady = () => {};
+window.GRIT_READY = new Promise((r) => { resolveReady = r; });
+
+function loadScript(src) {
+  return new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = `${src}?retry=${Date.now()}`;
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
+  });
+}
+
+async function ensureData(page) {
+  const missing = [];
+  for (const f of DATA_FILES[page] || []) {
+    if (f.ok()) continue;
+    console.warn(`[GRIT] ${f.src} 파일을 불러오지 못해 다시 받아 봅니다.`);
+    await loadScript(f.src);
+    if (!f.ok()) {
+      console.error(`[GRIT] ${f.src} 파일을 끝내 불러오지 못했습니다. GitHub에 파일이 있는지 확인해 주세요.`);
+      missing.push(f.src);
+    }
+  }
+  return missing;
+}
+
+function dataErrorHtml(message, tag) {
+  const t = tag || 'div';
+  return `
+    <${t} class="data-error" role="alert">
+      <p class="data-error-title">${esc(message)}</p>
+      <p>잠시 뒤 새로고침해 주세요. 계속 보이지 않으면 ${SITE.phone}로 문의해 주세요.</p>
+      <button type="button" class="btn btn-primary data-reload">새로고침</button>
+    </${t}>`;
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest && e.target.closest('.data-reload')) location.reload();
+});
 
 /* 편집 모드에서 고칠 수 있는 글자 표시. '@'로 시작하면 여러 페이지가 함께 쓰는 글자입니다. */
 function ed(key) { return ` data-edit="${esc(key)}"`; }
@@ -221,6 +276,8 @@ function initHome() {
           <span class="course-arrow" aria-hidden="true">→</span>
         </a>
       </li>`).join('');
+  } else if (courseEl) {
+    courseEl.innerHTML = dataErrorHtml('개설 과정을 불러오지 못했습니다.', 'li');
   }
   /* 겨울방학 특강 배너 */
   const winterEl = document.getElementById('hero-winter');
@@ -262,11 +319,16 @@ function initHome() {
 function initSchedule() {
   const root = document.getElementById('schedule-root');
   const tabsEl = document.getElementById('sched-tabs');
-  if (!root || !hasSchedule()) return;
+  if (!root) return;
+  if (!hasSchedule()) {
+    root.innerHTML = `<div class="container">${dataErrorHtml('시간표를 불러오지 못했습니다.')}</div>`;
+    return;
+  }
 
   const winterOn = hasWinter();
   const winterList = winterOn ? (WINTER.classes || []) : [];
-  const CURR = typeof CURRICULUM !== 'undefined' ? CURRICULUM : [];
+  const currOk = hasCurriculum();
+  const CURR = currOk ? CURRICULUM : [];
   const currById = {};
   CURR.forEach((c) => { currById[c.id] = c; });
   const alias = typeof CURRICULUM_ALIAS !== 'undefined' ? CURRICULUM_ALIAS : {};
@@ -457,16 +519,11 @@ function initSchedule() {
       if (groups.length) sections.push({ kind: lv.id, title: lv.label, groups });
     });
 
-    return `
-      <div class="sp-banner is-regular">
-        <div class="container">
-          <span class="sp-badge">CURRICULUM</span>
-          <h2 class="sp-title"${ed('@panel.curr.title')}>과정별 커리큘럼</h2>
-          <p class="sp-lead"${ed('@panel.curr.desc')}>과정을 고르면 대상, 수업 시간, 교재, 수업 특징과 주차별 진도를 볼 수 있습니다.</p>
-        </div>
-      </div>
-      <div class="sp-body is-tint">
-        <div class="container">
+    let body;
+    if (!currOk) {
+      body = dataErrorHtml('커리큘럼을 불러오지 못했습니다.');
+    } else {
+      body = `
           <div class="cp-picker">
             ${sections.map((s) => `
               <div class="cp-section is-${s.kind}">
@@ -479,8 +536,19 @@ function initSchedule() {
               </div>`).join('')}
           </div>
           ${courses.length ? courses.map(courseHtml).join('') : '<p class="empty">등록된 커리큘럼이 없습니다.</p>'}
-          <p class="curr-note"${ed('@panel.curr.note')}>※ 주차별 진도는 학교 진도와 학생 수준에 따라 조정될 수 있습니다. 자세한 내용은 상담 시 안내드립니다.</p>
+          <p class="curr-note"${ed('@panel.curr.note')}>※ 주차별 진도는 학교 진도와 학생 수준에 따라 조정될 수 있습니다. 자세한 내용은 상담 시 안내드립니다.</p>`;
+    }
+
+    return `
+      <div class="sp-banner is-regular">
+        <div class="container">
+          <span class="sp-badge">CURRICULUM</span>
+          <h2 class="sp-title"${ed('@panel.curr.title')}>과정별 커리큘럼</h2>
+          <p class="sp-lead"${ed('@panel.curr.desc')}>과정을 고르면 대상, 수업 시간, 교재, 수업 특징과 주차별 진도를 볼 수 있습니다.</p>
         </div>
+      </div>
+      <div class="sp-body is-tint">
+        <div class="container">${body}</div>
       </div>`;
   }
 
@@ -818,15 +886,22 @@ function initCurriculum() {
 }
 
 /* ===== 시작 ===== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const page = document.body.dataset.page;
-  if (page === 'curriculum') { initCurriculum(); return; }
-  renderHeader();
-  renderFooter();
-  initImageFallback();
-  if (page === 'home') initHome();
-  if (page === 'schedule') initSchedule();
-  if (page === 'notice') initNotice();
-  if (page === 'blog') initBlog();
-  if (page === 'post') initPost();
+  if (page === 'curriculum') { resolveReady(); initCurriculum(); return; }
+  try {
+    renderHeader();
+    renderFooter();
+    initImageFallback();
+    try { await ensureData(page); } catch (e) { /* 아래에서 안내 문구로 처리 */ }
+    if (page === 'home') initHome();
+    if (page === 'schedule') initSchedule();
+    if (page === 'notice') initNotice();
+    if (page === 'blog') initBlog();
+    if (page === 'post') initPost();
+  } catch (err) {
+    console.error('[GRIT] 화면을 그리는 중 문제가 생겼습니다.', err);
+  } finally {
+    resolveReady();
+  }
 });
