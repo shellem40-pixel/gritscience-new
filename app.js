@@ -49,9 +49,15 @@ const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-redu
 /* 편집 모드에서 고칠 수 있는 글자 표시. '@'로 시작하면 여러 페이지가 함께 쓰는 글자입니다. */
 function ed(key) { return ` data-edit="${esc(key)}"`; }
 
-/* 반 이름 + (괄호 글자) */
+/* 반 이름 옆 괄호 글자: sub 가 있으면 sub, 없으면 (대상 : ...) */
+function classSub(c) { return c.sub || (c.target ? `대상 : ${c.target}` : ''); }
 function className(c) {
-  return `${esc(c.name)}${c.sub ? ` <small class="sub">(${esc(c.sub)})</small>` : ''}`;
+  const sub = classSub(c);
+  return `${esc(c.name)}${sub ? ` <small class="sub">(${esc(sub)})</small>` : ''}`;
+}
+function classText(c) {
+  const sub = classSub(c);
+  return sub ? `${c.name} (${sub})` : c.name;
 }
 /* "토요반 오후 2:30-5:00" → 첫 단어 굵게 */
 function fmtTime(t) {
@@ -69,7 +75,16 @@ function sessionsHtml(list) {
   if (!list || !list.length) return '추후 안내';
   return list.map((s) => `<b>${esc(s.day)}</b> ${esc(s.time)}`).join('<br>');
 }
-function clsKey(c, g, i) { return c.curr || `${g.id}-${i}`; }
+function clsKey(c, g, i) { return c.id || c.curr || `${g.id}-${i}`; }
+
+/* 주차별 진도 도우미 */
+function weekUnits(w) { return Array.isArray(w) ? w : ((w && w.units) || []); }
+function weekLabel(w, k) { return (w && !Array.isArray(w) && w.label) || `${k + 1}주차`; }
+function weekWhen(w) { return (w && !Array.isArray(w) && w.when) || ''; }
+function tracksOf(cur) {
+  if (cur.tracks && cur.tracks.length) return cur.tracks;
+  return [{ name: '', weeks: cur.weeks || cur.steps || [] }];
+}
 
 /* ===== 편집 글자를 다른 곳(과정 버튼 등)에도 맞춰 보여 주기 ===== */
 function htmlToText(html) {
@@ -85,20 +100,21 @@ document.addEventListener('edits:applied', (e) => {
     const text = src ? src.textContent : (shared[key] ? htmlToText(shared[key]) : '');
     if (text.trim()) el.textContent = text.replace(/\s+/g, ' ').trim();
   });
-  document.querySelectorAll('.cs').forEach(fillStepDetail);
+  document.querySelectorAll('.cw-track').forEach(fillStepDetail);
 });
 
-/* 휴대폰: 고른 STEP 의 설명을 아래 칸에 보여 줌 */
-function fillStepDetail(cs) {
-  const box = cs.querySelector('.step-detail');
-  const li = cs.querySelector('.cs-steps li.is-picked') || cs.querySelector('.cs-steps li');
+/* 휴대폰: 고른 주차의 진도를 아래 칸에 보여 줌 */
+function fillStepDetail(track) {
+  const box = track.querySelector('.step-detail');
+  const li = track.querySelector('.cs-steps li.is-picked') || track.querySelector('.cs-steps li');
   if (!box || !li) return;
-  cs.querySelectorAll('.cs-steps li').forEach((x) => x.classList.toggle('is-picked', x === li));
+  track.querySelectorAll('.cs-steps li').forEach((x) => x.classList.toggle('is-picked', x === li));
   const no = li.querySelector('.step-no');
-  const t = li.querySelector('h4');
   const d = li.querySelector('.step-desc');
+  const w = li.querySelector('.wk-when');
   box.innerHTML = `<span class="step-no">${esc(no ? no.textContent : '')}</span>
-    <strong>${esc(t ? t.textContent : '')}</strong><p>${esc(d ? d.textContent : '')}</p>`;
+    <div class="step-detail-body">${d ? d.innerHTML : ''}</div>
+    ${w ? `<p class="wk-when">${esc(w.textContent)}</p>` : ''}`;
 }
 
 /* ===== 헤더 ===== */
@@ -192,15 +208,15 @@ function postCard(p) {
 
 /* ===== 홈 ===== */
 function initHome() {
-  /* 개설 과정 카드 (편집 모드에서 학년 칸·반 이름을 고칠 수 있음) */
+  /* 개설 과정 카드 (data/schedule.js 의 HOME_COURSES, 편집 모드에서 글자를 고칠 수 있음) */
   const courseEl = document.getElementById('hero-courses');
-  if (courseEl && hasSchedule()) {
-    courseEl.innerHTML = REGULAR_COURSES.map((g) => `
+  if (courseEl && typeof HOME_COURSES !== 'undefined') {
+    courseEl.innerHTML = HOME_COURSES.map((h) => `
       <li>
-        <a href="schedule.html#${g.id}">
-          <span class="course-tag"${ed(`@grp.${g.id}.tag`)}>${esc(g.tag)}</span>
+        <a href="${esc(h.href)}">
+          <span class="course-tag"${ed(h.tagKey)}>${esc(h.tag)}</span>
           <span class="course-body">
-            ${g.classes.map((c, i) => `<span class="course-line"${ed(`@cls.${clsKey(c, g, i)}.name`)}>${className(c)}</span>`).join('')}
+            ${h.lines.map((l) => `<span class="course-line"${ed(l.key)}>${esc(l.text)}</span>`).join('')}
           </span>
           <span class="course-arrow" aria-hidden="true">→</span>
         </a>
@@ -254,6 +270,7 @@ function initSchedule() {
   const currById = {};
   CURR.forEach((c) => { currById[c.id] = c; });
   const alias = typeof CURRICULUM_ALIAS !== 'undefined' ? CURRICULUM_ALIAS : {};
+  const galias = typeof GROUP_ALIAS !== 'undefined' ? GROUP_ALIAS : {};
 
   /* 커리큘럼으로 볼 과정 (특강 → 고등 → 중등 순서) */
   const courses = [];
@@ -269,6 +286,7 @@ function initSchedule() {
     });
   });
   const courseIds = courses.map((c) => c.id);
+  const firstRegular = (courses.find((c) => c.kind !== 'winter') || courses[0] || {}).id || null;
   const nameKey = (c) => (c.kind === 'winter' ? `@w.${c.id}.name` : `@cls.${c.id}.name`);
 
   /* ---------- 1) 겨울방학 특강 ---------- */
@@ -324,11 +342,15 @@ function initSchedule() {
     const block = (g, i) => {
       const rows = g.classes.map((c, j) => {
         const id = clsKey(c, g, j);
+        const many = c.times && c.times.length > 4 ? ' is-many' : '';
         return `
           <div class="sched-row">
             <div class="sched-info">
               <strong class="cls-name"><span${ed(`@cls.${id}.name`)}>${className(c)}</span></strong>
-              <p class="time-lines"${ed(`@cls.${id}.times`)}>${timesHtml(c.times)}</p>
+              <div class="cls-detail">
+                <p class="time-lines${many}"${ed(`@cls.${id}.times`)}>${timesHtml(c.times)}</p>
+                <p class="cls-book"><span class="cls-book-label">교재</span><span${ed(`@cls.${id}.book`)}>${esc(c.book || '추후 안내')}</span></p>
+              </div>
             </div>
             ${currById[id] ? `<a class="btn btn-primary sched-btn" href="#c-${id}">커리큘럼 보기</a>` : ''}
           </div>`;
@@ -344,6 +366,7 @@ function initSchedule() {
         <section class="sched-block${i % 2 ? ' is-tint' : ''}" id="blk-${g.id}">
           <div class="container">
             <h3 class="sched-title"${ed(`@grp.${g.id}.title`)}>${esc(g.title)}</h3>
+            ${g.sub ? `<p class="sched-sub"${ed(`@grp.${g.id}.sub`)}>${esc(g.sub)}</p>` : ''}
             <div class="sched-rows">${rows}${notes}</div>
           </div>
         </section>`;
@@ -355,8 +378,8 @@ function initSchedule() {
           <h2 class="sp-title"${ed(`@panel.${lv.id}.title`)}>${esc(lv.title)}</h2>
           <p class="sp-lead"${ed(`@panel.${lv.id}.desc`)}>${esc(lv.desc)}</p>
           ${groups.length > 1 ? `
-            <nav class="sp-jump" aria-label="학년 바로가기">
-              ${groups.map((g) => `<a href="#${g.id}" data-mirror="@grp.${g.id}.tag">${esc(g.tag)}</a>`).join('')}
+            <nav class="sp-jump" aria-label="구역 바로가기">
+              ${groups.map((g) => `<a href="#${g.id}">${esc(g.tag)}</a>`).join('')}
             </nav>` : ''}
         </div>
       </div>
@@ -364,69 +387,99 @@ function initSchedule() {
   }
 
   /* ---------- 3) 커리큘럼 ---------- */
+  function trackHtml(id, t, ti) {
+    const weeks = t.weeks || [];
+    const n = weeks.length || 1;
+    const cols = n <= 8 ? n : Math.ceil(n / 2);                       /* PC 넓은 화면 */
+    const tcols = n % 4 === 0 ? 4 : (n % 3 === 0 ? 3 : Math.min(4, n)); /* 좁은 화면 · 태블릿 · 휴대폰 */
+    return `
+      <div class="cw-track">
+        ${t.name ? `<h4 class="cw-track-name"><span${ed(`@cur.${id}.t${ti}.name`)}>${esc(t.name)}</span></h4>` : ''}
+        <ol class="cs-steps" style="--n:${cols};--nt:${tcols}">
+          ${weeks.map((w, k) => {
+            const units = weekUnits(w);
+            const when = weekWhen(w);
+            return `
+              <li tabindex="0">
+                <span class="step-no">${esc(weekLabel(w, k))}<span class="wk-sfx"> 진도</span></span>
+                <p class="step-desc"${ed(`@cur.${id}.t${ti}.w${k + 1}`)}>${units.length ? units.map(esc).join('<br>') : '추후 안내'}</p>
+                ${when ? `<span class="wk-when">${esc(when)}</span>` : ''}
+              </li>`;
+          }).join('')}
+        </ol>
+        <div class="step-detail" aria-live="polite"></div>
+      </div>`;
+  }
+
   function courseHtml(c) {
     const cur = c.cur;
     const isW = c.kind === 'winter';
-    const steps = cur.steps || [];
-    const timesKey = isW ? `@w.${c.id}.times` : `@cls.${c.id}.times`;
+    const id = c.id;
+    const timesKey = isW ? `@w.${id}.times` : `@cls.${id}.times`;
     const timesDefault = isW ? sessionsHtml(c.cls.sessions) : timesHtml(c.cls.times);
-    const targetKey = isW ? `@w.${c.id}.target` : `@cur.${c.id}.target`;
-    const targetDefault = isW ? (c.cls.target || cur.target || '상담 시 안내') : (cur.target || '상담 시 안내');
+    const targetKey = isW ? `@w.${id}.target` : `@cur.${id}.target`;
+    const targetDefault = isW ? (c.cls.target || cur.target || '상담 시 안내') : (cur.target || c.cls.target || '상담 시 안내');
+    const bookKey = isW ? `@cur.${id}.book` : `@cls.${id}.book`;
+    const bookDefault = isW ? (cur.book || '추후 안내') : (c.cls.book || cur.book || '추후 안내');
     const eyebrow = isW
       ? `<p class="eyebrow">겨울방학 특강 · ${esc(c.cls.grade)}</p>`
       : `<p class="eyebrow" data-mirror="@grp.${c.group.id}.title">${esc(c.group.title)}</p>`;
     const back = isW ? '#winter' : `#${c.group.id}`;
     return `
-      <article class="cs${isW ? ' is-winter' : ''}" id="course-${c.id}" hidden>
+      <article class="cs is-${c.kind}" id="course-${id}" hidden>
         <header class="cs-head">
           ${eyebrow}
           <h3 class="cs-title"><span${ed(nameKey(c))}>${isW ? esc(c.cls.name) : className(c.cls)}</span></h3>
-          <p class="cs-goal"${ed(`@cur.${c.id}.goal`)}>${esc(cur.goal || '과정 목표는 상담 시 안내드립니다.')}</p>
+          <p class="cs-goal"${ed(`@cur.${id}.goal`)}>${esc(cur.goal || '과정 목표는 상담 시 안내드립니다.')}</p>
         </header>
         <dl class="cs-facts">
           <div><dt>대상</dt><dd${ed(targetKey)}>${esc(targetDefault)}</dd></div>
           <div><dt>수업 시간</dt><dd><p class="time-lines"${ed(timesKey)}>${timesDefault}</p></dd></div>
-          <div><dt>교재</dt><dd${ed(`@cur.${c.id}.book`)}>${esc(cur.book || '상담 시 안내')}</dd></div>
+          <div><dt>교재</dt><dd${ed(bookKey)}>${esc(bookDefault)}</dd></div>
+          <div class="is-feat"><dt>수업 특징</dt><dd><p${ed(`@cur.${id}.feat`)}>${esc(cur.feature || '상담 시 안내')}</p></dd></div>
         </dl>
-        <ol class="cs-steps" data-n="${steps.length}" style="--n:${steps.length || 1}">
-          ${steps.map((s, k) => `
-            <li tabindex="0">
-              <span class="step-no">STEP ${k + 1}</span>
-              <h4${ed(`@cur.${c.id}.s${k + 1}.t`)}>${esc(s.title)}</h4>
-              <p class="step-desc"${ed(`@cur.${c.id}.s${k + 1}.d`)}>${esc(s.desc)}</p>
-            </li>`).join('')}
-        </ol>
-        <div class="step-detail" aria-live="polite"></div>
+        <p class="cw-heading">주차별 진도</p>
+        ${tracksOf(cur).map((t, ti) => trackHtml(id, t, ti)).join('')}
+        ${cur.note ? `<p class="cw-note">※ <span${ed(`@cur.${id}.note`)}>${esc(cur.note)}</span></p>` : ''}
         <a class="text-link cs-back" href="${back}">← 시간표로 돌아가기</a>
       </article>`;
   }
 
   function curriculumPanel() {
-    const pickGroups = [{ kind: 'winter', label: '겨울방학 특강' }]
-      .concat(LEVELS.map((lv) => ({ kind: lv.id, label: lv.label })))
-      .map((pg) => Object.assign(pg, { items: courses.filter((c) => c.kind === pg.kind) }))
-      .filter((pg) => pg.items.length);
+    const chip = (c) => `<a class="cp-chip" href="#c-${c.id}" data-id="${c.id}" data-mirror="${nameKey(c)}">${esc(c.kind === 'winter' ? c.cls.name : classText(c.cls))}</a>`;
+    const sections = [];
+    const wItems = courses.filter((c) => c.kind === 'winter');
+    if (wItems.length) sections.push({ kind: 'winter', title: '겨울방학 특강', groups: [{ label: '특강', items: wItems }] });
+    LEVELS.forEach((lv) => {
+      const groups = REGULAR_COURSES.filter((g) => g.level === lv.level)
+        .map((g) => ({ label: g.title, mirror: `@grp.${g.id}.title`, items: courses.filter((c) => c.group === g) }))
+        .filter((x) => x.items.length);
+      if (groups.length) sections.push({ kind: lv.id, title: lv.label, groups });
+    });
+
     return `
       <div class="sp-banner is-regular">
         <div class="container">
           <span class="sp-badge">CURRICULUM</span>
           <h2 class="sp-title"${ed('@panel.curr.title')}>과정별 커리큘럼</h2>
-          <p class="sp-lead"${ed('@panel.curr.desc')}>과정을 고르면 대상, 수업 시간, 교재와 단계별 커리큘럼을 볼 수 있습니다.</p>
+          <p class="sp-lead"${ed('@panel.curr.desc')}>과정을 고르면 대상, 수업 시간, 교재, 수업 특징과 주차별 진도를 볼 수 있습니다.</p>
         </div>
       </div>
       <div class="sp-body is-tint">
         <div class="container">
           <div class="cp-picker">
-            ${pickGroups.map((pg) => `
-              <div class="cp-group${pg.kind === 'winter' ? ' is-winter' : ''}">
-                <p class="cp-label">${esc(pg.label)}</p>
-                <div class="cp-chips">
-                  ${pg.items.map((c) => `<a class="cp-chip" href="#c-${c.id}" data-id="${c.id}" data-mirror="${nameKey(c)}">${esc(c.cls.name)}</a>`).join('')}
-                </div>
+            ${sections.map((s) => `
+              <div class="cp-section is-${s.kind}">
+                <p class="cp-level">${esc(s.title)}</p>
+                ${s.groups.map((pg) => `
+                  <div class="cp-group">
+                    <p class="cp-label"${pg.mirror ? ` data-mirror="${esc(pg.mirror)}"` : ''}>${esc(pg.label)}</p>
+                    <div class="cp-chips">${pg.items.map(chip).join('')}</div>
+                  </div>`).join('')}
               </div>`).join('')}
           </div>
           ${courses.length ? courses.map(courseHtml).join('') : '<p class="empty">등록된 커리큘럼이 없습니다.</p>'}
-          <p class="curr-note">※ 단계 구성과 교재는 기본 틀입니다. 학교별 진도와 세부 교재는 상담 시 안내드립니다.</p>
+          <p class="curr-note"${ed('@panel.curr.note')}>※ 주차별 진도는 학교 진도와 학생 수준에 따라 조정될 수 있습니다. 자세한 내용은 상담 시 안내드립니다.</p>
         </div>
       </div>`;
   }
@@ -462,11 +515,11 @@ function initSchedule() {
     });
   });
 
-  /* ---------- 휴대폰: STEP 칸 누르면 설명 보기 ---------- */
+  /* ---------- 휴대폰: 주차 칸 누르면 진도 보기 ---------- */
   const pickStep = (li) => {
-    const cs = li.closest('.cs');
-    cs.querySelectorAll('.cs-steps li').forEach((x) => x.classList.toggle('is-picked', x === li));
-    fillStepDetail(cs);
+    const tr = li.closest('.cw-track');
+    tr.querySelectorAll('.cs-steps li').forEach((x) => x.classList.toggle('is-picked', x === li));
+    fillStepDetail(tr);
   };
   root.addEventListener('click', (e) => {
     const li = e.target.closest('.cs-steps li');
@@ -480,7 +533,7 @@ function initSchedule() {
     e.preventDefault();
     pickStep(li);
   });
-  root.querySelectorAll('.cs').forEach(fillStepDetail);
+  root.querySelectorAll('.cw-track').forEach(fillStepDetail);
 
   /* ---------- 주소(#)에 따라 탭 바꾸기 ---------- */
   let currentCourse = null;
@@ -508,7 +561,7 @@ function initSchedule() {
       if (on) ch.setAttribute('aria-current', 'true'); else ch.removeAttribute('aria-current');
     });
     const cs = document.getElementById(`course-${id}`);
-    if (cs) fillStepDetail(cs);
+    if (cs) cs.querySelectorAll('.cw-track').forEach(fillStepDetail);
   }
 
   function scrollToEl(el, onlyIfAbove) {
@@ -527,7 +580,8 @@ function initSchedule() {
     let focus = null;
     let course = null;
 
-    const group = REGULAR_COURSES.find((g) => g.id === raw);
+    const gid = galias[raw] || raw;
+    const group = REGULAR_COURSES.find((g) => g.id === gid);
     if (panelIds.includes(raw)) {
       panel = raw;
     } else if (group) {
@@ -547,7 +601,7 @@ function initSchedule() {
 
     show(panel);
     if (panel === 'curriculum') {
-      course = course || currentCourse || courseIds[0] || null;
+      course = course || currentCourse || firstRegular;
       if (course) {
         currentCourse = course;
         pickCourse(course);
