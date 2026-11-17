@@ -48,6 +48,16 @@
 .hw-arrow { flex-shrink: 0; transition: transform .15s; }
 .hero-winter:hover .hw-arrow { transform: translateX(3px); }
 
+/* 시간표 데이터를 못 불러왔을 때 안내 */
+.data-error {
+  padding: 18px 4px 6px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--c-sub);
+}
+.data-error-title { font-size: 15px; font-weight: 700; color: var(--c-text); }
+.data-error .btn { margin-top: 12px; }
+
 @media (max-width: 640px) {
   .course-body .course-line { font-size: 14px; }
   .hero-winter { padding: 12px 14px; }
