@@ -1,5 +1,5 @@
 /* ===== 서브 페이지 공통: 타이틀 배경 + 옅은 하늘색 띠 =====
-   학원&시스템, 시간표, 커리큘럼, 공지사항 페이지에서 style.css 다음에 불러옵니다. */
+   시간표, 커리큘럼, 공지사항 페이지에서 style.css 다음에 불러옵니다. */
 :root {
   --c-tint: #eef4f8;        /* 섹션 사이 옅은 하늘색 띠 */
   --c-tint-line: #dbe7ef;   /* 하늘색 띠 경계선 */
@@ -90,10 +90,27 @@
   line-height: 1.3;
 }
 
+/* ----- 데이터를 못 불러왔을 때 안내 ----- */
+.data-error {
+  max-width: 560px;
+  margin: 48px auto;
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--c-sub);
+  background: #fff;
+  border: 1px solid var(--c-tint-line);
+  border-radius: 8px;
+}
+.data-error-title { font-size: 18px; font-weight: 800; color: var(--c-text); }
+.data-error .btn { margin-top: 16px; }
+
 /* ----- 휴대폰 ----- */
 @media (max-width: 640px) {
   .page-head { padding: 44px 0 36px; }
   .page-head h1 { font-size: 28px; }
   .page-head h1::after { margin-top: 12px; }
   .page-head p { margin-top: 12px; font-size: 15px; }
+  .data-error { margin: 32px auto; padding: 24px 16px; }
 }
