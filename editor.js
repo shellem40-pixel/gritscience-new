@@ -11,6 +11,7 @@
        - 같은 이름이 한 페이지에 여러 곳 있으면 한 곳을 고칠 때 함께 바뀝니다.
    ■ 저장: GitHub 저장소의 data/edits.json 파일 하나에만 저장합니다.
        토큰은 이 브라우저(localStorage)에만 보관하고, 홈페이지 파일에는 넣지 않습니다.
+   ■ app.js 가 화면을 다 그렸다는 신호(window.GRIT_READY)를 기다린 뒤 시작합니다.
    ========================================================= */
 (function () {
   const CONFIG = {
@@ -21,7 +22,8 @@
     tokenKey: 'grit-editor-token',
     modeKey: 'grit-editor-on',
     tokenUrl: 'https://github.com/settings/personal-access-tokens/new',
-    revealAfter: 1500              // 수정 글자를 못 불러와도 이 시간(ms) 뒤에는 글자를 보여 줌
+    revealAfter: 1500,             // 수정 글자를 못 불러와도 이 시간(ms) 뒤에는 글자를 보여 줌
+    readyWait: 6000                // 화면 그리기 신호를 최대 이 시간(ms)까지 기다림
   };
 
   const PAGE_NAMES = { home: '홈', schedule: '시간표&커리큘럼', curriculum: '커리큘럼', notice: '공지사항', blog: '블로그' };
@@ -178,7 +180,19 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
+  /* app.js 가 시간표 등 화면을 다 그릴 때까지 기다림 (데이터 파일을 다시 받는 경우 대비) */
+  async function waitForPage() {
+    if (!window.GRIT_READY) return;
+    try {
+      await Promise.race([
+        window.GRIT_READY,
+        new Promise(r => setTimeout(r, CONFIG.readyWait))
+      ]);
+    } catch (e) { /* 그대로 진행 */ }
+  }
+
   async function init() {
+    await waitForPage();
     state.page = (document.body && document.body.dataset.page) || 'page';
     state.els = Array.from(document.querySelectorAll('[data-edit]'));
     state.els.forEach(el => {
