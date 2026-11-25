@@ -5,10 +5,15 @@
       "head-text": "학년별 목표에 맞춘 5단계 과정으로 개념부터 실전까지 빈틈없이 준비합니다"
     }
   },
-  "updated": "2026-11-14T14:14:12.294Z",
+  "updated": "2026-11-25T08:42:39.971Z",
   "shared": {
     "@w.w-mid.times": "<strong>화·목반</strong> 오후 5:00-7:30",
     "@w.w-pre1.times": "<strong>월·수반</strong> 오후 2:00-4:30<br><strong>토</strong> 오전 10:00-12:30",
-    "@w.w-pre2-phy.times": "<strong>월·수반  </strong>오후 6:00-9:00<br><strong>화·목반  </strong>오전10:00-12:30"
+    "@w.w-pre2-phy.times": "<strong>월·수반  </strong>오후 6:00-9:00<br><strong>화·목반  </strong>오전10:00-12:30",
+    "@grp.g-m-sky.title": "중등 과정 + 선행반",
+    "@cls.r-msky.name": "중등 과정 선행반 <small class=\"sub\">(대상 : 중1, 중2)</small>",
+    "@grp.g-m-pre.title": "고등과정 선행반",
+    "@cls.r-mint.name": "고등통합과학 선행반 <small class=\"sub\">(대상 : 중1, 중2, 중3)</small>",
+    "@cls.r-mint3.name": "고등통합과학 선행반 <small class=\"sub\">(대상 : 중3)</small>"
   }
 }
